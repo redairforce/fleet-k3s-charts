@@ -1,0 +1,28 @@
+{{- define "channels.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    {{- include "channels.labels" .context | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .storageSize }}
+  storageClassName: {{ .storageClassName }}
+{{- end }}
+
+---
+
+{{- with .Values }}
+{{- include "channels.configPvc" (dict 
+    "pvcName" (printf "%s-config" (include "channels.fullname" $))
+    "namespace" .namespace
+    "storageSize" .pvc.size
+    "storageClassName" .pvc.storageClassName
+    "context" $
+) }}
+{{- end }}

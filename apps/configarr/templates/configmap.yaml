@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configarr
+  namespace: {{ .Values.namespace }}
+data:
+  config.yml: |
+    trashGuideUrl: {{ .Values.trashGuideUrl | quote }}
+    recyclarrConfigUrl: {{ .Values.recyclarrConfigUrl | quote }}
+
+{{- range $appName, $instances := .Values.apps }}
+    {{ $appName }}:
+{{- range $instanceName, $instance := $instances }}
+      {{ $instanceName }}:
+        base_url: {{ $instance.baseUrl | quote }}
+        api_key: {{ $instance.apiKey | quote }}
+        delete_old_custom_formats: {{ $instance.deleteOldCustomFormats }}
+        replace_existing_custom_formats: {{ $instance.replaceExistingCustomFormats }}
+        quality_definition:
+          type: {{ if eq $appName "sonarr" }}series{{ else }}movie{{ end }}
+
+        include:
+        {{- range $instance.include }}
+          - template: {{ . }}
+        {{- end }}
+
+        {{- if $instance.customFormats }}
+        custom_formats: {{ toYaml $instance.customFormats | nindent 8 }}
+        {{- else }}
+        custom_formats: []
+        {{- end }}
+{{- end }}
+{{- end }}

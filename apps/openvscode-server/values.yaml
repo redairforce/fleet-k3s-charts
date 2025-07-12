@@ -1,0 +1,17 @@
+replicaCount: 1
+namespace: default
+
+image:
+  repository: lscr.io/linuxserver/openvscode-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  puid: "1000"
+  pgid: "1000"
+  tz: "America/Chicago"
+  dockerMods: "linuxserver/mods:universal-docker|linuxserver/mods:code-server-nodejs|linuxserver/mods:code-server-python3|linuxserver/mods:code-server-npmglobal"
+  nodejsModVersion: "20"
+
+service:
+  type: ClusterIP

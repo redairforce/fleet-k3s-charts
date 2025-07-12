@@ -1,0 +1,139 @@
+{{- define "lidarr.deployment" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      initContainers:
+      {{- if .config }}
+      - name: init-config
+        image: busybox
+        command: 
+        - sh
+        - -c
+        - |
+          echo "Checking source config..."
+          ls -la /tmp/lidarr-config/
+          echo "Source config content:"
+          cat /tmp/lidarr-config/config.xml
+          echo "Copying config if needed..."
+          if [ ! -f /config/config.xml ]; then
+            cp /tmp/lidarr-config/config.xml /config/config.xml
+            echo "Config copied. Verifying..."
+            ls -la /config/config.xml
+            echo "Destination content:"
+            cat /config/config.xml
+          else
+            echo "Config already exists"
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .volumes.config.subPath }}
+        - name: lidarr-config
+          mountPath: /tmp/lidarr-config
+      {{- end }}
+      containers:
+      - name: lidarr
+        image: "{{ .image.repository }}:{{ .image.tag }}"
+        imagePullPolicy: {{ .image.pullPolicy }}
+        ports:
+        - containerPort: 8686
+          name: http
+        env:
+        - name: PUID
+          value: "{{ .env.puid }}"
+        - name: PGID
+          value: "{{ .env.pgid }}"
+        - name: TZ
+          value: "{{ .env.tz }}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .volumes.config.subPath }}
+        - name: music
+          mountPath: /mnt/music
+        - name: downloads
+          mountPath: /mnt/downloads
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8686
+          initialDelaySeconds: {{ .healthcheck.startPeriod }}
+          periodSeconds: {{ .healthcheck.interval }}
+          timeoutSeconds: {{ .healthcheck.timeout }}
+          failureThreshold: {{ .healthcheck.retries }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8686
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8686
+          initialDelaySeconds: {{ .healthcheck.startPeriod }}
+          periodSeconds: {{ .healthcheck.interval }}
+          timeoutSeconds: {{ .healthcheck.timeout }}
+          failureThreshold: {{ .healthcheck.retries }}
+        resources:
+          {{- toYaml .resources | nindent 12 }}
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ .volumes.config.pvcName }}
+      - name: music
+        persistentVolumeClaim:
+          claimName: {{ .volumes.music.pvcName }}
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: {{ .volumes.downloads.pvcName }}
+      {{- if .config }}
+      - name: lidarr-config
+        configMap:
+          name: lidarr-config
+      {{- end }}
+      restartPolicy: Always
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"
+{{- end }}
+
+---
+
+{{- with .Values }}
+{{- include "lidarr.deployment" (dict 
+  "name" "lidarr" 
+  "namespace" .namespace 
+  "replicaCount" .replicaCount 
+  "image" .image 
+  "env" .env 
+  "volumes" .volumes
+  "healthcheck" .healthcheck
+  "resources" .resources
+  "config" .config
+) }}
+{{- end }}

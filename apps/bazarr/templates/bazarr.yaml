@@ -1,0 +1,7 @@
+{{- range $name, $config := .Values }}
+{{- if hasPrefix "bazarr-" $name }}
+{{- $context := merge $config (dict "name" $name) }}
+{{- include "bazarr.deployment" $context }}
+---
+{{- end }}
+{{- end }}

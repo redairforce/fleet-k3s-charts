@@ -1,0 +1,34 @@
+{{- define "sonarr.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    app: {{ .name }}
+  ports:
+  - protocol: TCP
+    port: 8989
+    targetPort: 8989
+    name: webui
+{{- end }}
+
+---
+{{- $root := . -}}
+{{- with .Values }}
+{{- include "sonarr.service" (dict
+  "name" "sonarr-1080"
+  "namespace" (index . "sonarr-1080").namespace
+  "serviceType" (index . "sonarr-1080").service.type
+)}}
+---
+{{- include "sonarr.service" (dict
+  "name" "sonarr-4k"
+  "namespace" (index . "sonarr-4k").namespace
+  "serviceType" (index . "sonarr-4k").service.type
+)}}
+{{- end }}

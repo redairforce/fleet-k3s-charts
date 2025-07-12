@@ -1,0 +1,28 @@
+{{- define "lidarr.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    app: {{ .name }}
+  ports:
+  - protocol: TCP
+    port: 8686
+    targetPort: 8686
+    name: webui
+{{- end }}
+
+---
+
+{{- with .Values }}
+{{- include "lidarr.service" (dict 
+  "name" "lidarr" 
+  "namespace" .namespace 
+  "serviceType" .service.type
+) }}
+{{- end }}

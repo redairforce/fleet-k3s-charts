@@ -1,0 +1,5 @@
+apiVersion: v2
+name: openvscode-server
+description: A Helm chart for deploying OpenVSCode Server with Cloudflare Tunnels and local paths on node01
+version: 0.1.0
+appVersion: "latest"

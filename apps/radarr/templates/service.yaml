@@ -1,0 +1,34 @@
+
+{{- define "radarr.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    app: {{ .name }}
+  ports:
+  - protocol: TCP
+    port: 7878
+    targetPort: 7878
+    name: webui
+{{- end }}
+---
+{{- $root := . -}}
+{{- with .Values }}
+{{- include "radarr.service" (dict
+  "name" "radarr-1080"
+  "namespace" (index . "radarr-1080").namespace
+  "serviceType" (index . "radarr-1080").service.type
+)}}
+---
+{{- include "radarr.service" (dict
+  "name" "radarr-4k"
+  "namespace" (index . "radarr-4k").namespace
+  "serviceType" (index . "radarr-4k").service.type
+)}}
+{{- end }}

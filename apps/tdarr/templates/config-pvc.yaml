@@ -1,0 +1,24 @@
+{{- define "tdarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    {{- include "tdarr.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+
+---
+{{- include "tdarr.configPvc" (dict
+  "pvcName" .Values.persistence.internal.pvcName
+  "namespace" .Values.namespace
+  "Chart" .Chart
+  "Release" .Release
+) }}

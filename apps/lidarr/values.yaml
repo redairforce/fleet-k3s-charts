@@ -1,0 +1,67 @@
+hostname: "lidarr.williamchambless.com"
+namespace: "arr"
+replicaCount: 1
+
+image:
+  repository: lscr.io/linuxserver/lidarr
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  puid: "1000"
+  pgid: "1000"
+  tz: "America/Chicago"
+
+config:
+  xml:
+    config.xml: |
+      <Config>
+        <BindAddress>*</BindAddress>
+        <Port>8686</Port>
+        <SslPort>9896</SslPort>
+        <EnableSsl>False</EnableSsl>
+        <LaunchBrowser>True</LaunchBrowser>
+        <ApiKey>3g6d23002eg35gb9b9g93dfgdf35b33e</ApiKey>
+        <AuthenticationMethod>None</AuthenticationMethod>
+        <AuthenticationRequired>Enabled</AuthenticationRequired>
+        <Branch>master</Branch>
+        <LogLevel>debug</LogLevel>
+        <SslCertPath></SslCertPath>
+        <SslCertPassword></SslCertPassword>
+        <UrlBase></UrlBase>
+        <InstanceName>Lidarr</InstanceName>
+        <UpdateMechanism>Docker</UpdateMechanism>
+        <PostgresUser>arruser</PostgresUser>
+        <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+        <PostgresPort>5432</PostgresPort>
+        <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+        <PostgresMainDb>lidarr_main</PostgresMainDb>
+        <PostgresLogDb>lidarr_log</PostgresLogDb>
+      </Config>
+
+service:
+  type: ClusterIP
+  port: 8686
+
+volumes:
+  config:
+    pvcName: lidarr-config-longhorn
+    subPath: lidarr
+  music:
+    pvcName: arr-music-pvc
+  downloads:
+    pvcName: arr-downloads-pvc
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+resources:
+  limits:
+    memory: "1024Mi"
+    cpu: "1000m"
+  requests:
+    memory: "256Mi"
+    cpu: "250m"

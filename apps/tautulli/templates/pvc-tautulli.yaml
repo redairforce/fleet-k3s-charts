@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tautulli-pvc
+  labels:
+    app: tautulli-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pvc.size | default "10Gi" }}
+  storageClassName: {{ .Values.pvc.storageClassName | default "longhorn-nvme" }}

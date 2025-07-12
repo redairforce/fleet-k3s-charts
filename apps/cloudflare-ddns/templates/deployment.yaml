@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cloudflare-ddns.fullname" . }}
+  labels:
+    app: {{ include "cloudflare-ddns.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "cloudflare-ddns.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cloudflare-ddns.name" . }}
+    spec:
+      containers:
+        - name: cloudflare-ddns
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: ZONE
+              value: {{ .Values.cloudflare.zone | quote }}
+            - name: SUBDOMAIN
+              value: {{ .Values.cloudflare.subdomain | quote }}
+            - name: PROXIED
+              value: {{ .Values.cloudflare.proxied | quote }}
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (include "cloudflare-ddns.fullname" .) .Values.existingSecret }}
+                  key: api-token
+            - name: INTERVAL
+              value: '{{ .Values.cloudflare.interval | default "300" }}'

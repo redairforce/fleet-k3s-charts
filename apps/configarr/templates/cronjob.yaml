@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: configarr
+  namespace: {{ .Values.namespace }}
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- if .Values.image.pullSecret }}
+          imagePullSecrets:
+            - name: {{ .Values.image.pullSecret }}
+          {{- end }}
+          containers:
+            - name: configarr
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              tty: true
+              
+              volumeMounts:
+                - mountPath: /app/repos
+                  name: app-data
+                  subPath: configarr-repos
+                - name: config-volume
+                  mountPath: /app/config/config.yml
+                  subPath: config.yml
+          volumes:
+            - name: app-data
+              persistentVolumeClaim:
+                claimName: {{ .Values.appDataPVC }}
+            - name: config-volume
+              configMap:
+                name: configarr
+          restartPolicy: Never

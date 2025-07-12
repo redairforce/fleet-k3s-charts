@@ -1,0 +1,15 @@
+{{- with .Values }}
+{{- if .config }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lidarr-config
+  namespace: {{ .namespace }}
+data:
+  {{- range $path, $content := .config.xml }}
+  {{ $path }}: |
+{{ $content | indent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

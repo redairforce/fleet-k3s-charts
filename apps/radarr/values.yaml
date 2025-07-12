@@ -1,0 +1,140 @@
+radarr-1080:
+  hostname: "radarr-1080.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+  
+  config:
+    xml:
+      config.xml: |
+        <Config>
+          <BindAddress>*</BindAddress>
+          <Port>7878</Port>
+          <SslPort>9898</SslPort>
+          <EnableSsl>False</EnableSsl>
+          <LaunchBrowser>True</LaunchBrowser>
+          <ApiKey>2f5c12001df24fa8a8f82cfece24a22a</ApiKey>
+          <AuthenticationMethod>None</AuthenticationMethod>
+          <AuthenticationRequired>Enabled</AuthenticationRequired>
+          <Branch>develop</Branch>
+          <LogLevel>debug</LogLevel>
+          <SslCertPath></SslCertPath>
+          <SslCertPassword></SslCertPassword>
+          <UrlBase></UrlBase>
+          <InstanceName>Radarr</InstanceName>
+          <UpdateMechanism>Docker</UpdateMechanism>
+          <PostgresUser>arruser</PostgresUser>
+          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPort>5432</PostgresPort>
+          <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+          <PostgresMainDb>radarr_1080_main</PostgresMainDb>
+          <PostgresLogDb>radarr_1080_log</PostgresLogDb>
+        </Config>
+  
+  image:
+    repository: "ghcr.io/linuxserver/radarr"
+    tag: "develop"
+    pullPolicy: IfNotPresent
+
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+  
+  service:
+    type: ClusterIP
+    port: 7878
+  
+  volumes:
+    config:
+      pvcName: "radarr-1080-pvc"
+      subPath: radarr-1080
+    movies:
+      pvcName: arr-movies-pvc
+      # Removed subPath - mount entire PVC at /mnt/movies
+    downloads:
+      pvcName: arr-downloads-pvc
+  
+  healthcheck:
+    startPeriod: 30
+    interval: 30
+    timeout: 5
+    retries: 3
+  
+  resources:
+    limits:
+      memory: "1024Mi"
+      cpu: "1000m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+radarr-4k:
+  hostname: "radarr-4k.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+  
+  config:
+    xml:
+      config.xml: |
+        <Config>
+          <BindAddress>*</BindAddress>
+          <Port>7878</Port>
+          <SslPort>9898</SslPort>
+          <EnableSsl>False</EnableSsl>
+          <LaunchBrowser>True</LaunchBrowser>
+          <ApiKey>2f5c12001df24fa8a8f82cfece24a22b</ApiKey>
+          <AuthenticationMethod>None</AuthenticationMethod>
+          <AuthenticationRequired>Enabled</AuthenticationRequired>
+          <Branch>develop</Branch>
+          <LogLevel>debug</LogLevel>
+          <SslCertPath></SslCertPath>
+          <SslCertPassword></SslCertPassword>
+          <UrlBase></UrlBase>
+          <InstanceName>Radarr</InstanceName>
+          <UpdateMechanism>Docker</UpdateMechanism>
+          <PostgresUser>arruser</PostgresUser>
+          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPort>5432</PostgresPort>
+          <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+          <PostgresMainDb>radarr_4k_main</PostgresMainDb>
+          <PostgresLogDb>radarr_4k_log</PostgresLogDb>
+        </Config>
+  
+  image:
+    repository: "ghcr.io/linuxserver/radarr"
+    tag: "develop"
+    pullPolicy: IfNotPresent
+  
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+  
+  service:
+    type: ClusterIP
+    port: 7878
+  
+  volumes:
+    config:
+      pvcName: "radarr-4k-pvc"
+      subPath: radarr-4k
+    movies:
+      pvcName: arr-movies-pvc
+      # Removed subPath - mount entire PVC at /mnt/movies
+    downloads:
+      pvcName: arr-downloads-pvc
+  
+
+  healthcheck:
+    startPeriod: 30
+    interval: 30
+    timeout: 5
+    retries: 3
+
+  resources:
+    limits:
+      memory: "1024Mi"
+      cpu: "1000m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"

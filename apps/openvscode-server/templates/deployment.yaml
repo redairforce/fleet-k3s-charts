@@ -1,0 +1,61 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-openvscode-server
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: openvscode-server
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: openvscode-server
+  template:
+    metadata:
+      labels:
+        app: openvscode-server
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: node01
+      containers:
+      - name: openvscode-server
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 3000
+          name: webui
+        env:
+        - name: PUID
+          value: "{{ .Values.env.puid }}"
+        - name: PGID
+          value: "{{ .Values.env.pgid }}"
+        - name: TZ
+          value: "{{ .Values.env.tz }}"
+        - name: DOCKER_MODS
+          value: "{{ .Values.env.dockerMods }}"
+        - name: NODEJS_MOD_VERSION
+          value: "{{ .Values.env.nodejsModVersion }}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+          readOnly: true
+        - name: appdata
+          mountPath: /mnt/appdata
+      volumes:
+      - name: config
+        hostPath:
+          path: /mnt/appdata/utilities/openvscode-server/config
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+      - name: appdata
+        hostPath:
+          path: /mnt/appdata
+      restartPolicy: Always
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"

@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "radarr.fullname" . }}
+  labels:
+    {{- include "radarr.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - {{ index .Values "radarr-1080" "hostname" }}
+        - {{ index .Values "radarr-4k" "hostname" }}
+      secretName: radarr-tls
+  rules:
+    - host: {{ index .Values "radarr-1080" "hostname" }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: radarr-1080
+                port:
+                  number: 7878
+    - host: {{ index .Values "radarr-4k" "hostname" }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: radarr-4k
+                port:
+                  number: 7878

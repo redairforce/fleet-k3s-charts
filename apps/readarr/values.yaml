@@ -1,0 +1,107 @@
+readarrAudio:
+  hostname: "readarr-audio.williamchambless.com"
+  image:
+    repository: lscr.io/linuxserver/readarr
+    tag: 0.4.18-develop
+    pullPolicy: IfNotPresent
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+  config:
+    xml:
+      config.xml: |
+        <Config>
+          <BindAddress>*</BindAddress>
+          <Port>8787</Port>
+          <SslPort>9897</SslPort>
+          <EnableSsl>False</EnableSsl>
+          <LaunchBrowser>True</LaunchBrowser>
+          <ApiKey>2f5c12001df24fa8a8f82cfece24a22c</ApiKey>
+          <AuthenticationMethod>None</AuthenticationMethod>
+          <AuthenticationRequired>Enabled</AuthenticationRequired>
+          <Branch>develop</Branch>
+          <LogLevel>debug</LogLevel>
+          <SslCertPath></SslCertPath>
+          <SslCertPassword></SslCertPassword>
+          <UrlBase></UrlBase>
+          <InstanceName>ReadarrAudio</InstanceName>
+          <UpdateMechanism>Docker</UpdateMechanism>
+          <PostgresUser>arruser</PostgresUser>
+          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPort>5432</PostgresPort>
+          <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+          <PostgresMainDb>readarr_audio_main</PostgresMainDb>
+          <PostgresLogDb>readarr_audio_log</PostgresLogDb>
+          <PostgresCacheDb>readarr_audio_cache</PostgresCacheDb>
+        </Config>
+
+readarrEbook:
+  hostname: "readarr-ebook.williamchambless.com"
+  image:
+    repository: lscr.io/linuxserver/readarr
+    tag: 0.4.18-develop
+    pullPolicy: IfNotPresent
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+  config:
+    xml:
+      config.xml: |
+        <Config>
+          <BindAddress>*</BindAddress>
+          <Port>8787</Port>
+          <SslPort>9897</SslPort>
+          <EnableSsl>False</EnableSsl>
+          <LaunchBrowser>True</LaunchBrowser>
+          <ApiKey>2f5c12001df24fa8a8f82cfece24a22d</ApiKey>
+          <AuthenticationMethod>None</AuthenticationMethod>
+          <AuthenticationRequired>Enabled</AuthenticationRequired>
+          <Branch>develop</Branch>
+          <LogLevel>debug</LogLevel>
+          <SslCertPath></SslCertPath>
+          <SslCertPassword></SslCertPassword>
+          <UrlBase></UrlBase>
+          <InstanceName>ReadarrEbook</InstanceName>
+          <UpdateMechanism>Docker</UpdateMechanism>
+          <PostgresUser>arruser</PostgresUser>
+          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPort>5432</PostgresPort>
+          <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+          <PostgresMainDb>readarr_ebook_main</PostgresMainDb>
+          <PostgresLogDb>readarr_ebook_log</PostgresLogDb>
+          <PostgresCacheDb>readarr_ebook_cache</PostgresCacheDb>
+        </Config>
+
+namespace: "arr"
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 8787
+
+volumes:
+  config:
+    pvcNameLonghornAudio: readarr-audio-config-longhorn
+    pvcNameLonghornEbook: readarr-ebook-config-longhorn
+    subPathAudio: readarr-audio
+    subPathEbook: readarr-ebook
+  books:
+    pvcName: arr-books-pvc
+  downloads:
+    pvcName: arr-downloads-pvc
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+resources:
+  limits:
+    memory: "512Mi"
+    cpu: "1000m"
+  requests:
+    memory: "256Mi"
+    cpu: "250m"

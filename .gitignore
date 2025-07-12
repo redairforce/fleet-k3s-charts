@@ -1,0 +1,4 @@
+sensitive-values/
+*.secret.yaml
+backups/
+dry-runs/

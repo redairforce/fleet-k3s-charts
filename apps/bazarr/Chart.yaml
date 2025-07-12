@@ -1,0 +1,5 @@
+apiVersion: v2
+name: bazarr
+description: A Helm chart for deploying Bazarr 1080 and 4k instances
+version: 0.1.0
+appVersion: latest

@@ -1,0 +1,17 @@
+{{- range $instance := list "sonarr-1080" "sonarr-4k" }}
+{{- with (index $.Values $instance) }}
+{{- if .config }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $instance }}-config
+  namespace: {{ .namespace }}
+data:
+  {{- range $path, $content := .config.xml }}
+  {{ $path }}: |
+{{ $content | indent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

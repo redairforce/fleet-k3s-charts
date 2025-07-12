@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "organizr.fullname" . }}
+  namespace: {{ .Values.namespace | default "default" }}
+  labels:
+    {{- include "organizr.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "organizr.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "organizr.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- with .Values.env }}
+            - name: PUID
+              value: {{ .PUID | quote }}
+            - name: PGID
+              value: {{ .PGID | quote }}
+            - name: TZ
+              value: {{ .TZ | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: {{ .Values.persistence.config.mountPath }}
+          {{- if .Values.probes.liveness.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.spec.path | default "/" }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.spec.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.spec.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.spec.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.spec.failureThreshold }}
+          {{- end }}
+          {{- if .Values.probes.readiness.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.spec.path | default "/" }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.spec.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.spec.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.spec.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.spec.failureThreshold }}
+          {{- end }}
+          {{- if .Values.probes.startup.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.spec.path | default "/" }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.startup.spec.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.spec.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.startup.spec.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.startup.spec.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "organizr.fullname" . }}-config

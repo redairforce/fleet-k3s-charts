@@ -1,0 +1,36 @@
+huntarr:
+  hostname: "huntarr.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+  
+  image:
+    repository: "huntarr/huntarr"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+  
+  service:
+    type: ClusterIP
+    port: 9705
+  
+  volumes:
+    config:
+      pvcName: "huntarr-pvc"
+  
+  healthcheck:
+    startPeriod: 30
+    interval: 30
+    timeout: 5
+    retries: 3
+  
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+    requests:
+      memory: "128Mi"
+      cpu: "100m"

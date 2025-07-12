@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gluetun-daemon
+  namespace: vpn
+spec:
+  selector:
+    matchLabels:
+      app: gluetun
+  template:
+    metadata:
+      labels:
+        app: gluetun
+    spec:
+      nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
+      containers:
+        - name: gluetun
+          image: {{ .Values.gluetunImage }}
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          ports:
+            - containerPort: 8388
+              hostPort: 8388
+              name: shadowsocks
+              protocol: TCP
+            - containerPort: 8888
+              hostPort: 8888
+              name: httpproxy
+              protocol: TCP
+            - containerPort: {{ .Values.socks5.port | default 1080 }}
+              hostPort: {{ .Values.socks5.port | default 1080 }}
+              name: socks5
+              protocol: TCP
+
+        - name: socks5-server
+          image: serjs/go-socks5-proxy
+          args: ["-verbose"]
+          ports:
+            - containerPort: 1081
+              hostPort: 1081
+              name: socks5-alt
+              protocol: TCP

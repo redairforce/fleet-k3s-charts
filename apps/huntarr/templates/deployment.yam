@@ -1,0 +1,95 @@
+
+{{- define "huntarr.deployment" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+    version: {{ .image.tag }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+        version: {{ .image.tag }}
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: huntarr
+        image: "{{ .image.repository }}:{{ .image.tag }}"
+        imagePullPolicy: {{ .image.pullPolicy }}
+        ports:
+        - containerPort: 9705
+          name: http
+        env:
+        - name: PUID
+          value: "{{ .env.puid }}"
+        - name: PGID
+          value: "{{ .env.pgid }}"
+        - name: TZ
+          value: "{{ .env.tz }}"
+        - name: HUNTARR_PORT
+          value: "9705"  # Add this to override the injected value
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9705
+          initialDelaySeconds: {{ .healthcheck.startPeriod }}
+          periodSeconds: {{ .healthcheck.interval }}
+          timeoutSeconds: {{ .healthcheck.timeout }}
+          failureThreshold: {{ .healthcheck.retries }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: 9705
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9705
+          initialDelaySeconds: {{ .healthcheck.startPeriod }}
+          periodSeconds: {{ .healthcheck.interval }}
+          timeoutSeconds: {{ .healthcheck.timeout }}
+          failureThreshold: {{ .healthcheck.retries }}
+        resources:
+          {{- toYaml .resources | nindent 12 }}
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ .volumes.config.pvcName }}
+      restartPolicy: Always
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"
+{{- end }}
+
+---
+{{- include "huntarr.deployment" (dict
+  "name" "huntarr"
+  "namespace" .Values.huntarr.namespace
+  "replicaCount" .Values.huntarr.replicaCount
+  "image" .Values.huntarr.image
+  "env" .Values.huntarr.env
+  "volumes" .Values.huntarr.volumes
+  "healthcheck" .Values.huntarr.healthcheck
+  "resources" .Values.huntarr.resources
+)}}

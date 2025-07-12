@@ -1,0 +1,23 @@
+
+{{- define "huntarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+---
+{{- include "huntarr.configPvc" (dict
+  "pvcName" .Values.huntarr.volumes.config.pvcName
+  "namespace" .Values.huntarr.namespace
+  "appName" "huntarr"
+)}}

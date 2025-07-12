@@ -1,0 +1,221 @@
+schedule: "0 * * * *"
+image:
+  repository: ghcr.io/raydak-labs/configarr
+  tag: latest
+  pullPolicy: IfNotPresent
+namespace: arr
+
+appDataPVC: configarr-pvc
+
+trashGuideUrl: https://github.com/TRaSH-Guides/Guides
+recyclarrConfigUrl: https://github.com/recyclarr/config-templates
+
+apps:
+  sonarr:
+    sonarr-1080:
+      baseUrl: http://sonarr-1080.arr.svc.cluster.local:8989
+      apiKey: "3a6d23001ef34fb9b9f93dffd35b133a"
+      deleteOldCustomFormats: true
+      replaceExistingCustomFormats: true
+
+      include:
+        - sonarr-quality-definition-series
+        - sonarr-v4-quality-profile-web-1080p
+        - sonarr-v4-custom-formats-web-1080p
+
+      customFormats:
+        - trash_ids:
+            - c9eafd50846d299b862ca9bb6ea91950 # x264
+          assign_scores_to:
+            - name: WEB-1080p
+              score: 100
+        - trash_ids:
+            - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV)
+            - 90501962793d580d011511155c97e4e5 # VP9
+          assign_scores_to:
+            - name: WEB-1080p
+              score: -1000
+    sonarr-4k:
+      baseUrl: http://sonarr-4k.arr.svc.cluster.local:8989
+      apiKey: "4b7e34002fg45gc0c0g04eggf46c244b"
+      deleteOldCustomFormats: true
+      replaceExistingCustomFormats: true
+
+      include:
+        - sonarr-quality-definition-series
+        - sonarr-v4-quality-profile-web-2160p
+        - sonarr-v4-custom-formats-web-2160p
+
+      customFormats:
+        - trash_ids:
+            - 385e9e8581d33133c3961bdcdeffb7b4 # DV HDR10+ Boost (highest)
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 2000
+        - trash_ids:
+            - 2b239ed870daba8126a53bd5dc8dc1c8 # DV HDR10+
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1950
+        - trash_ids:
+            - 7878c33f1963fefb3d6c8657d46c2f0a # DV HDR10 (with fallback)
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1900
+        - trash_ids:
+            - bb019e1cd00f304f80971c965de064dc # HDR (undefined) for DV + HDR undefined
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1800
+        - trash_ids:
+            - 9b27ab6498ec0f31a3353992e19434ca # DV (WEBDL) without HDR10 fallback (lowered)
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1000
+        - trash_ids:
+            - 27954b0a80aab882522a88a4d9eae1cd # DV SDR (penalized)
+          assign_scores_to:
+            - name: WEB-2160p
+              score: -10000
+        - trash_ids:
+            - 0dad0a507451acddd754fe6dc3a7f5e7 # HDR10+ Boost
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1200
+        - trash_ids:
+            - a3d82cbef5039f8d295478d28a887159 # HDR10+
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1150
+        - trash_ids:
+            - 3497799d29a085e2ac2df9d468413c94 # HDR10
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 700
+        - trash_ids:
+            - ec8fa7296b64e8cd390a1600981f3923 # Repack/Proper
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1000
+        - trash_ids:
+            - eb3d5cc0a2be0db205fb823640db6a3c # Repack v2
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1000
+        - trash_ids:
+            - 44e7c4de10ae50265753082e5dc76047 # Repack v3
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1000
+        - trash_ids:
+            - 0d7824bb924701997f874e7ff7d4844a # TrueHD ATMOS
+          assign_scores_to:
+            - name: WEB-2160p
+              score: 1000
+  radarr:
+    radarr-1080:
+      baseUrl: http://radarr-1080.arr.svc.cluster.local:7878
+      apiKey: "2f5c12001df24fa8a8f82cfece24a22a"
+      deleteOldCustomFormats: true
+      replaceExistingCustomFormats: true
+
+      include:
+        - radarr-quality-definition-movie
+        - radarr-quality-profile-remux-web-1080p
+        - radarr-custom-formats-remux-web-1080p
+
+      customFormats:
+        - trash_ids:
+            - 2899d84dc9372de3408e6d8cc18e9666 # x264
+          assign_scores_to:
+            - name: Remux + WEB 1080p
+              score: 100
+        - trash_ids:
+            - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
+            - cae4ca30163749b891686f95532519bd # AV1
+            - ae4cfaa9283a4f2150ac3da08e388723 # VP9
+          assign_scores_to:
+            - name: Remux + WEB 1080p
+              score: -1000
+    radarr-4k:
+      baseUrl: http://radarr-4k.arr.svc.cluster.local:7878
+      apiKey: "2f5c12001df24fa8a8f82cfece24a22b"
+      deleteOldCustomFormats: true
+      replaceExistingCustomFormats: true
+
+      include:
+        - radarr-quality-definition-movie
+        - radarr-quality-profile-remux-web-2160p
+        - radarr-custom-formats-remux-web-2160p
+
+      customFormats:
+        - trash_ids:
+            - cae4ca30163749b891686f95532519bd # AV1
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: -1000
+        - trash_ids:
+            - 55a5b50cb416dea5a50c4955896217ab # DV HDR10+ Boost (highest)
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 2000
+        - trash_ids:
+            - c53085ddbd027d9624b320627748612f # DV HDR10+
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 1950
+        - trash_ids:
+            - e23edd2482476e595fb990b12e7c609c # DV HDR10 (with fallback)
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 1900
+        - trash_ids:
+            - 2a4d9069cc1fe3242ff9bdaebed239bb # HDR (undefined) for DV + HDR undefined
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 1800
+        - trash_ids:
+            - 923b6abef9b17f937fab56cfcf89e1f1 # DV (WEBDL) without HDR10 fallback (lowered)
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 1000
+        - trash_ids:
+            - a3e19f8f627608af0211acd02bf89735 # DV SDR (penalized)
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: -10000
+        - trash_ids:
+            - b17886cb4158d9fea189859409975758 # HDR10+ Boost
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 1200
+        - trash_ids:
+            - b974a6cd08c1066250f1f177d7aa1225 # HDR10+
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 1150
+        - trash_ids:
+            - dfb86d5941bc9075d6af23b09c2aeecd # HDR10
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 700
+        - trash_ids:
+            - e7718d7a3ce595f289bfee26adc178f5 # Repack/Proper
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 800
+        - trash_ids:
+            - ae43b294509409a6a13919dedd4764c4 # Repack2
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 800
+        - trash_ids:
+            - 5caaaa1c08c1742aa4342d8c4cc463f2 # Repack3
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 800
+        - trash_ids:
+            - 496f355514737f7d83bf7aa4d24f8169 # TrueHD Atmos
+          assign_scores_to:
+            - name: Remux + WEB 2160p
+              score: 100

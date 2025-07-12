@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gluetun-socks
+  namespace: vpn
+  labels:
+    app: gluetun
+spec:
+  clusterIP: None  # Headless for internal DNS round-robin
+  selector:
+    app: gluetun
+  ports:
+    - name: shadowsocks
+      port: {{ .Values.shadowsocks.port | default 8388 }}
+      targetPort: shadowsocks
+      protocol: TCP
+    - name: httpproxy
+      port: 8888
+      targetPort: httpproxy
+      protocol: TCP
+    - name: socks5
+      port: {{ .Values.socks5.port | default 1080 }}
+      targetPort: socks5
+      protocol: TCP

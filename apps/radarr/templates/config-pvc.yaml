@@ -1,0 +1,31 @@
+{{- define "radarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+---
+{{- $root := . -}}
+{{- with .Values }}
+{{- include "radarr.configPvc" (dict
+  "pvcName" (index . "radarr-1080").volumes.config.pvcName
+  "namespace" (index . "radarr-1080").namespace
+  "appName" "radarr-1080"
+)}}
+---
+{{- include "radarr.configPvc" (dict
+  "pvcName" (index . "radarr-4k").volumes.config.pvcName
+  "namespace" (index . "radarr-4k").namespace
+  "appName" "radarr-4k"
+)}}
+{{- end }}

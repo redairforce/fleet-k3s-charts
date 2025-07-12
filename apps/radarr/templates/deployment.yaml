@@ -1,0 +1,150 @@
+{{- define "radarr.deployment" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+    version: {{ .image.tag }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+        version: {{ .image.tag }}
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      initContainers:
+      {{- if .config }}
+      - name: init-config
+        image: busybox
+        command: 
+        - sh
+        - -c
+        - |
+          echo "Checking source config..."
+          ls -la /tmp/radarr-config/
+          echo "Source config content:"
+          cat /tmp/radarr-config/config.xml
+          echo "Copying config if needed..."
+          if [ ! -f /config/config.xml ]; then
+            cp /tmp/radarr-config/config.xml /config/config.xml
+            echo "Config copied. Verifying..."
+            ls -la /config/config.xml
+            echo "Destination content:"
+            cat /config/config.xml
+          else
+            echo "Config already exists"
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .volumes.config.subPath }}
+        - name: {{ .name }}-config
+          mountPath: /tmp/radarr-config
+      {{- end }}
+      containers:
+      - name: radarr
+        image: "{{ .image.repository }}:{{ .image.tag }}"
+        imagePullPolicy: {{ .image.pullPolicy }}
+        ports:
+        - containerPort: 7878
+          name: http
+        env:
+        - name: PUID
+          value: "{{ .env.puid }}"
+        - name: PGID
+          value: "{{ .env.pgid }}"
+        - name: TZ
+          value: "{{ .env.tz }}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .volumes.config.subPath }}
+        - name: movies
+          mountPath: /mnt/movies
+        - name: downloads
+          mountPath: /downloads
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 7878
+          initialDelaySeconds: {{ .healthcheck.startPeriod }}
+          periodSeconds: {{ .healthcheck.interval }}
+          timeoutSeconds: {{ .healthcheck.timeout }}
+          failureThreshold: {{ .healthcheck.retries }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: 7878
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 7878
+          initialDelaySeconds: {{ .healthcheck.startPeriod }}
+          periodSeconds: {{ .healthcheck.interval }}
+          timeoutSeconds: {{ .healthcheck.timeout }}
+          failureThreshold: {{ .healthcheck.retries }}
+        resources:
+          {{- toYaml .resources | nindent 12 }}
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ .volumes.config.pvcName }}
+      - name: movies
+        persistentVolumeClaim:
+          claimName: {{ .volumes.movies.pvcName }}
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: {{ .volumes.downloads.pvcName }}
+      {{- if .config }}
+      - name: {{ .name }}-config
+        configMap:
+          name: {{ .name }}-config
+      {{- end }}
+      restartPolicy: Always
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"
+{{- end }}
+
+---
+{{- include "radarr.deployment" (dict
+  "name" "radarr-1080"
+  "namespace" (index .Values "radarr-1080").namespace
+  "replicaCount" (index .Values "radarr-1080").replicaCount
+  "image" (index .Values "radarr-1080").image
+  "env" (index .Values "radarr-1080").env
+  "volumes" (index .Values "radarr-1080").volumes
+  "healthcheck" (index .Values "radarr-1080").healthcheck
+  "resources" (index .Values "radarr-1080").resources
+  "config" (index .Values "radarr-1080").config
+)}}
+---
+{{- include "radarr.deployment" (dict
+  "name" "radarr-4k"
+  "namespace" (index .Values "radarr-4k").namespace
+  "replicaCount" (index .Values "radarr-4k").replicaCount
+  "image" (index .Values "radarr-4k").image
+  "env" (index .Values "radarr-4k").env
+  "volumes" (index .Values "radarr-4k").volumes
+  "healthcheck" (index .Values "radarr-4k").healthcheck
+  "resources" (index .Values "radarr-4k").resources
+  "config" (index .Values "radarr-4k").config
+)}}

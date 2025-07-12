@@ -1,0 +1,78 @@
+# qbittorrent/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: qbittorrent
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: qbittorrent
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+        release: {{ .Release.Name }}
+        {{- range $key, $value := .Values.labels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      containers:
+        - name: qbittorrent
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c", "/usr/bin/qbittorrent-nox --webui-port=8081 --profile=/config | tee -a /config/qBittorrent/logs/qbittorrent.log"]
+          env:
+            - name: PUID
+              value: {{ .Values.env.PUID | quote }}
+            - name: PGID
+              value: {{ .Values.env.PGID | quote }}
+            - name: TZ
+              value: {{ .Values.env.TZ }}
+            - name: WEBUI_PORT
+              value: {{ .Values.env.WEBUI_PORT | quote }}
+          ports:
+            - containerPort: {{ .Values.env.WEBUI_PORT }}
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: {{ .Values.volumes.config.mountPath }}
+              subPath: {{ .Values.volumes.config.subPath }}
+            - name: downloads
+              mountPath: {{ .Values.volumes.downloads.mountPath }}
+          {{- if .Values.healthcheck.enabled }}
+          livenessProbe:
+            {{- toYaml .Values.healthcheck.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.healthcheck.readinessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumes.config.pvcName }}
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumes.downloads.pvcName }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}

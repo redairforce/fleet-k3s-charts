@@ -1,0 +1,5 @@
+apiVersion: v2
+name: configarr
+description: A Helm chart for Configarr
+version: 0.1.0
+appVersion: "latest"

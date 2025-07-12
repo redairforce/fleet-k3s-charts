@@ -1,0 +1,42 @@
+hostname: "sabnzbd.williamchambless.com"
+replicaCount: 1
+namespace: "downloader"
+
+image:
+  repository: "lscr.io/linuxserver/sabnzbd"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+env:
+  puid: "1000"
+  pgid: "1000"
+  tz: "America/Chicago"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+volumes:
+  config:
+    pvcName: sabnzbd-config-pvc
+    subPath: sabnzbd
+  downloads:
+    pvcName: downloader-downloads-pvc
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+resources:
+  limits:
+    memory: "4Gi"
+    cpu: "4000m"
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Node selector for dedicated download node
+nodeSelector:
+  kubernetes.io/hostname: node01

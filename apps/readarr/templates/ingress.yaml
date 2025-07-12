@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "readarr.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "readarr.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - {{ .Values.readarrAudio.hostname }}
+        - {{ .Values.readarrEbook.hostname }}
+      secretName: readarr-tls
+  rules:
+    - host: {{ .Values.readarrAudio.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: readarr-audio
+                port:
+                  number: 8787
+    - host: {{ .Values.readarrEbook.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: readarr-ebook
+                port:
+                  number: 8787

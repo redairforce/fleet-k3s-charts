@@ -1,0 +1,17 @@
+{{- range $instance := list "bazarr-1080" "bazarr-4k" }}
+{{- with (index $.Values $instance) }}
+{{- if .config }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $instance }}-config
+  namespace: {{ .namespace }}
+data:
+  {{- range $path, $content := .config.ini }}
+  {{ $path }}: |
+{{ $content | indent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

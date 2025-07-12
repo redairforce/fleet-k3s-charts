@@ -1,0 +1,98 @@
+replicaCount: 1
+
+gluetunImage: qmcgaw/gluetun:latest
+
+nodeSelector: {}
+
+protonvpn:
+  serverCountries: "United States"
+  serverCities: "Dallas"
+  freeOnly: "off"
+
+env:
+  - name: VPN_TYPE
+    value: "wireguard"
+  - name: VPN_SERVICE_PROVIDER
+    value: "protonvpn"
+  - name: VPN_PORT_FORWARDING
+    value: "on"
+  - name: VPN_PORT_FORWARDING_PROVIDER
+    value: "protonvpn"
+  - name: "SERVER_CITIES"
+    value: "Dallas"
+  - name: "PORT_FORWARD_ONLY"
+    value: "on"
+  - name: VPN_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: gluetun-secrets
+        key: protonvpn-username
+  - name: VPN_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: gluetun-secrets
+        key: protonvpn-password
+  - name: WIREGUARD_PRIVATE_KEY
+    valueFrom:
+      secretKeyRef:
+        name: gluetun-secrets
+        key: wireguard-private-key
+  - name: UPDATER_PERIOD
+    value: "24h"
+  - name: WIREGUARD_MTU
+    value: "1440"
+  - name: TZ
+    value: "America/Chicago"
+  - name: LOG_LEVEL
+    value: "debug"
+  - name: DNS_ADDRESS
+    value: "1.1.1.1"
+  - name: DOT
+    value: "off"
+  - name: HEALTH_SERVER_ADDRESS
+    value: "127.0.0.1:9999"
+  - name: HEALTH_TARGET_ADDRESS
+    value: "1.1.1.1:443"
+  - name: HEALTH_READ_HEADER_TIMEOUT
+    value: "1000ms"
+  - name: HEALTH_READ_TIMEOUT
+    value: "5000ms"
+  - name: HEALTH_SUCCESS_WAIT_DURATION
+    value: "30s"
+  - name: HEALTH_VPN_DURATION_INITIAL
+    value: "10s"
+  - name: HEALTH_VPN_DURATION_ADDITION
+    value: "10s"
+  - name: HTTPPROXY
+    value: "on"
+  - name: HTTPPROXY_LISTENING_ADDRESS
+    value: "0.0.0.0:8888"
+  - name: HTTPPROXY_LOG
+    value: "on"
+  - name: SHADOWSOCKS
+    value: "on"
+  - name: SHADOWSOCKS_LISTENING_ADDRESS
+    value: "0.0.0.0:8388"
+  - name: SOCKS5
+    value: "on"
+  - name: SOCKS5_LISTENING_ADDRESS
+    value: "0.0.0.0:1080"
+  - name: FIREWALL_INPUT_PORTS
+    value: "8388,1080,8888"
+
+shadowsocks:
+  enabled: true
+  port: 8388
+
+socks5:
+  enabled: true
+  port: 1080
+
+# Enable hostPort for SOCKS5 (and optional others)
+hostPorts:
+  enabled: true
+  ports:
+    - containerPort: 1080
+      hostPort: 1080
+      protocol: TCP
+

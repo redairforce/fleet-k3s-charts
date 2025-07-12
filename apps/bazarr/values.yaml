@@ -1,0 +1,129 @@
+bazarr-1080:
+  hostname: "bazarr-1080.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+
+  config:
+    ini:
+      config.ini: |
+        [general]
+        port = 6767
+        ip = 0.0.0.0
+        base_url = /
+        auth_type = None
+        auth_username =
+        auth_password =
+        branch = master
+        auto_update = 0
+        log_level = DEBUG
+        [postgres]
+        enabled = True
+        host = postgresql.arr.svc.cluster.local
+        port = 5432
+        database = bazarr_1080
+        username = arruser
+        password = XKUS1t1YsTGI1J
+
+  image:
+    repository: "ghcr.io/linuxserver/bazarr"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+
+  service:
+    type: ClusterIP
+    port: 6767
+
+  volumes:
+    config:
+      pvcName: "bazarr-1080-pvc"
+      subPath: bazarr-1080
+    movies:
+      pvcName: arr-movies-pvc
+      # Removed subPath to mount entire PVC
+    series:
+      pvcName: arr-series-pvc
+      # Removed subPath to mount entire PVC
+
+  healthcheck:
+    startPeriod: 30
+    interval: 30
+    timeout: 5
+    retries: 3
+
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+bazarr-4k:
+  hostname: "bazarr-4k.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+
+  config:
+    ini:
+      config.ini: |
+        [general]
+        port = 6767
+        ip = 0.0.0.0
+        base_url = /
+        auth_type = None
+        auth_username =
+        auth_password =
+        branch = master
+        auto_update = 0
+        log_level = DEBUG
+        [postgres]
+        enabled = True
+        host = postgresql.arr.svc.cluster.local
+        port = 5432
+        database = bazarr_4k
+        username = arruser
+        password = XKUS1t1YsTGI1J
+
+  image:
+    repository: "ghcr.io/linuxserver/bazarr"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+
+  service:
+    type: ClusterIP
+    port: 6767
+
+  volumes:
+    config:
+      pvcName: "bazarr-4k-pvc"
+      subPath: bazarr-4k
+    movies:
+      pvcName: arr-movies-pvc
+      # Removed subPath to mount entire PVC
+    series:
+      pvcName: arr-series-pvc
+      # Removed subPath to mount entire PVC
+
+  healthcheck:
+    startPeriod: 30
+    interval: 30
+    timeout: 5
+    retries: 3
+
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"

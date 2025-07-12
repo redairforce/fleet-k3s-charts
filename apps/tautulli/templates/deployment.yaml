@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tautulli.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: tautulli
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: tautulli
+  template:
+    metadata:
+      labels:
+        app: tautulli
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
+    spec:
+      containers:
+      - name: tautulli
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        env:
+        - name: PUID
+          value: "{{ .Values.env.puid }}"
+        - name: PGID
+          value: "{{ .Values.env.pgid }}"
+        - name: TZ
+          value: "{{ .Values.env.tz }}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .Values.volumes.config.subPath }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: tautulli-pvc
+      restartPolicy: Always

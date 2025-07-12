@@ -1,0 +1,35 @@
+{{- define "readarr.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    app: {{ .name }}
+  ports:
+  - protocol: TCP
+    port: 8787
+    targetPort: 8787
+    name: webui
+{{- end }}
+
+---
+
+{{- $root := . -}}
+{{- with .Values }}
+{{- include "readarr.service" (dict 
+  "name" "readarr-audio" 
+  "namespace" .namespace 
+  "serviceType" .service.type)
+}}
+---
+{{- include "readarr.service" (dict 
+  "name" "readarr-ebook" 
+  "namespace" .namespace
+  "serviceType" .service.type)
+}}
+{{- end }}

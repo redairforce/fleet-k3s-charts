@@ -1,0 +1,6 @@
+# qbittorrent/Chart.yaml
+apiVersion: v2
+name: qbittorrent
+description: A Helm chart for deploying qBittorrent on Kubernetes
+version: 0.1.0
+appVersion: "latest"

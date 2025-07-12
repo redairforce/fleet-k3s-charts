@@ -1,0 +1,6 @@
+# Chart.yaml
+apiVersion: v2
+name: organizr
+description: A Helm chart for deploying Organizr on Kubernetes with Cloudflare Tunnel
+version: 0.1.0
+appVersion: "latest"

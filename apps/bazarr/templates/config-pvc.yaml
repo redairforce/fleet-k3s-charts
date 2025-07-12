@@ -1,0 +1,30 @@
+{{- define "bazarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+---
+{{- with .Values }}
+{{- include "bazarr.configPvc" (dict
+  "pvcName" (index . "bazarr-1080").volumes.config.pvcName
+  "namespace" (index . "bazarr-1080").namespace
+  "appName" "bazarr-1080"
+)}}
+---
+{{- include "bazarr.configPvc" (dict
+  "pvcName" (index . "bazarr-4k").volumes.config.pvcName
+  "namespace" (index . "bazarr-4k").namespace
+  "appName" "bazarr-4k"
+)}}
+{{- end }}

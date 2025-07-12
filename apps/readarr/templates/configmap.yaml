@@ -1,0 +1,17 @@
+{{- range $instance := list "readarr-audio" "readarr-ebook" }}
+{{- with (index $.Values (ternary "readarrAudio" "readarrEbook" (eq $instance "readarr-audio"))) }}
+{{- if .config }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $instance }}-config
+  namespace: {{ $.Values.namespace }}
+data:
+  {{- range $path, $content := .config.xml }}
+  {{ $path }}: |
+{{ $content | indent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

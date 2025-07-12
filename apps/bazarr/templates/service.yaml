@@ -1,0 +1,31 @@
+{{- define "bazarr.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    app: {{ .name }}
+  ports:
+  - protocol: TCP
+    port: 6767
+    targetPort: 6767
+    name: webui
+{{- end }}
+{{- with .Values }}
+{{- include "bazarr.service" (dict
+  "name" "bazarr-1080"
+  "namespace" (index . "bazarr-1080").namespace
+  "serviceType" (index . "bazarr-1080").service.type
+)}}
+---
+{{- include "bazarr.service" (dict
+  "name" "bazarr-4k"
+  "namespace" (index . "bazarr-4k").namespace
+  "serviceType" (index . "bazarr-4k").service.type
+)}}
+{{- end }}

@@ -1,0 +1,143 @@
+{{- define "tdarr.deployment" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tdarr.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "tdarr.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "tdarr.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tdarr.selectorLabels" . | nindent 8 }}
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
+    spec:
+      # Remove the securityContext - let LSIO handle user management
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: tdarr
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8265
+          name: webui
+        - containerPort: 8266
+          name: server
+        env:
+        - name: TZ
+          value: "{{ .Values.env.tz }}"
+        - name: PUID
+          value: "{{ .Values.env.puid }}"
+        - name: PGID
+          value: "{{ .Values.env.pgid }}"
+        - name: UMASK_SET
+          value: "{{ .Values.env.umaskSet }}"
+        - name: serverIP
+          value: "{{ .Values.env.serverIP }}"
+        - name: serverPort
+          value: "{{ .Values.env.serverPort }}"
+        - name: webUIPort
+          value: "{{ .Values.env.webUIPort }}"
+        - name: internalNode
+          value: "{{ .Values.env.internalNode }}"
+        - name: inContainer
+          value: "{{ .Values.env.inContainer }}"
+        - name: ffmpegVersion
+          value: "{{ .Values.env.ffmpegVersion }}"
+        - name: nodeName
+          value: "{{ .Values.env.nodeName }}"
+        - name: auth
+          value: "{{ .Values.env.auth }}"
+        volumeMounts:
+        {{- if .Values.persistence.internal.enabled }}
+        - name: internal
+          mountPath: /app/server
+          subPath: {{ .Values.persistence.internal.subPath }}/server
+        - name: internal
+          mountPath: /app/configs
+          subPath: {{ .Values.persistence.internal.subPath }}/configs
+        - name: internal
+          mountPath: /app/logs
+          subPath: {{ .Values.persistence.internal.subPath }}/logs
+        {{- end }}
+        {{- if .Values.persistence.movies.enabled }}
+        - name: movies
+          mountPath: /mnt/movies
+        {{- end }}
+        {{- if .Values.persistence.series.enabled }}
+        - name: series
+          mountPath: /mnt/series
+        {{- end }}
+        {{- if .Values.persistence.ramdisk.enabled }}
+        - name: ramdisk
+          mountPath: {{ .Values.persistence.ramdisk.mountPath }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: webui
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: webui
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: webui
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 60  # Allow up to 10 minutes
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      {{- if .Values.persistence.internal.enabled }}
+      - name: internal
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.internal.pvcName }}
+      {{- end }}
+      {{- if .Values.persistence.movies.enabled }}
+      - name: movies
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.movies.pvcName }}
+      {{- end }}
+      {{- if .Values.persistence.series.enabled }}
+      - name: series
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.series.pvcName }}
+      {{- end }}
+      {{- if .Values.persistence.ramdisk.enabled }}
+      - name: ramdisk
+        {{- if eq .Values.persistence.ramdisk.type "tmpfs" }}
+        emptyDir:
+          medium: Memory
+          sizeLimit: {{ .Values.persistence.ramdisk.sizeLimit }}
+        {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"
+{{- end }}
+
+---
+{{- include "tdarr.deployment" . }}

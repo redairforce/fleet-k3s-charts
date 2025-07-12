@@ -1,0 +1,44 @@
+hostname: "channels.williamchambless.com"
+namespace: "arr"
+replicaCount: 1
+
+image:
+  repository: fancybits/channels-dvr
+  tag: tve
+  pullPolicy: IfNotPresent
+
+env:
+  puid: "0"
+  pgid: "0"
+  fsGroup: 1000
+  tz: "America/Chicago"
+
+resources:
+  limits:
+    memory: "2056Mi"
+    cpu: "2000m"
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+
+pvc:
+  size: "20Gi"
+  storageClassName: "longhorn-nvme"
+
+service:
+  type: ClusterIP
+  port: 8089
+
+volumes:
+  config:
+    pvcName: channels-config
+    subPath: channels
+  dvr:
+    pvcName: arr-downloads-pvc
+    subPath: plexdvr
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3

@@ -1,0 +1,26 @@
+{{- define "lidarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+
+---
+
+{{- with .Values }}
+{{- include "lidarr.configPvc" (dict 
+    "pvcName" .volumes.config.pvcName
+    "namespace" .namespace
+    "appName" "lidarr"
+) }}
+{{- end }}

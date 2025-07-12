@@ -1,0 +1,25 @@
+{{- define "huntarr.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    app: {{ .name }}
+  ports:
+  - protocol: TCP
+    port: {{ .servicePort }}
+    targetPort: 9705
+    name: webui
+{{- end }}
+---
+{{- include "huntarr.service" (dict
+  "name" "huntarr"
+  "namespace" .Values.huntarr.namespace
+  "serviceType" .Values.huntarr.service.type
+  "servicePort" .Values.huntarr.service.port
+)}}

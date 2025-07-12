@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "bazarr.fullname" . }}
+  namespace: {{ index .Values "bazarr-1080" "namespace" }}
+  labels:
+    {{- include "bazarr.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - {{ index .Values "bazarr-1080" "hostname" }}
+        - {{ index .Values "bazarr-4k" "hostname" }}
+      secretName: bazarr-tls
+  rules:
+    - host: {{ index .Values "bazarr-1080" "hostname" }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bazarr-1080
+                port:
+                  number: 6767
+    - host: {{ index .Values "bazarr-4k" "hostname" }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bazarr-4k
+                port:
+                  number: 6767

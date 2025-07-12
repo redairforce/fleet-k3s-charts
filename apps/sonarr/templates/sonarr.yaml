@@ -1,0 +1,7 @@
+{{- range $name, $config := .Values }}
+{{- if hasPrefix "sonarr-" $name }}
+{{- $context := merge $config (dict "name" $name) }}
+{{- include "sonarr.deployment" $context }}
+---
+{{- end }}
+{{- end }}

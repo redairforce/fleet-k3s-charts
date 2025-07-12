@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gluetun-daemon
+description: Gluetun as a DaemonSet for ProtonVPN WireGuard - the serjs/go-socks5-proxy isn't actually the proxy, for some odd reason gluetun doesn't work properly without having the second image running so I just leave it in. 
+type: application
+version: 0.1.0

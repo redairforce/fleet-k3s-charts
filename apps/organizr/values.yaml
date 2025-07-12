@@ -1,0 +1,81 @@
+namespace: web
+
+image:
+  repository: organizr/organizr
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+fullnameOverride: organizr
+
+env:
+  TZ: America/Chicago
+  PUID: "1001"
+  PGID: "1001"
+
+# Explicitly set to deployment
+controller:
+  type: deployment
+
+probes:
+  startup:
+    enabled: true
+    spec:
+      initialDelaySeconds: 20
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 30
+  liveness:
+    enabled: true
+    spec:
+      initialDelaySeconds: 20
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 3
+      path: /
+  readiness:
+    enabled: true
+    spec:
+      initialDelaySeconds: 20
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 3
+      path: /
+
+ingress:
+  main:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+      traefik.ingress.kubernetes.io/redirect-entry-point: https
+      traefik.ingress.kubernetes.io/redirect-permanent: "true"
+    hosts:
+      - host: organizr.williamchambless.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: organizr-tls
+        hosts:
+          - organizr.williamchambless.com
+
+persistence:
+  config:
+    enabled: true
+    type: pvc
+    storageClass: longhorn-nvme
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    mountPath: /config
+
+service:
+  main:
+    enabled: true
+    type: ClusterIP
+    ports:
+      http:
+        enabled: true
+        port: 80
+        protocol: TCP
+        targetPort: 80

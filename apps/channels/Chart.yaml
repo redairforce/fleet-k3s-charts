@@ -1,0 +1,6 @@
+apiVersion: v2
+name: channels
+description: A Helm chart for deploying Channels DVR with Cloudflare Tunnels and NFS shares
+type: application
+version: 0.1.0
+appVersion: "tve"

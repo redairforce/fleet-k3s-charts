@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  repository: oznu/cloudflare-ddns
+  tag: latest
+  pullPolicy: IfNotPresent
+
+cloudflare:
+  # If you're not using an existing Kubernetes Secret, put your API token here:
+  apiToken: ""  # base64-encoded automatically by Helm if secret is created
+
+  # Required fields:
+  zone: williamchambless.com
+  subdomain: home
+  proxied: true
+
+  # Add check interval in seconds (5 minutes = 300 seconds)
+  interval: 300
+
+# If you want to use a manually-created secret for the API token, put the name here.
+# If this is set, the 'cloudflare.apiToken' above will be ignored.
+existingSecret: cloudflare-api-token
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

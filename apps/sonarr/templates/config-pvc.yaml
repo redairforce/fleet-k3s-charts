@@ -1,0 +1,32 @@
+{{- define "sonarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+
+---
+{{- $root := . -}}
+{{- with .Values }}
+{{- include "sonarr.configPvc" (dict
+  "pvcName" (index . "sonarr-1080").volumes.config.pvcName
+  "namespace" (index . "sonarr-1080").namespace
+  "appName" "sonarr-1080"
+)}}
+---
+{{- include "sonarr.configPvc" (dict
+  "pvcName" (index . "sonarr-4k").volumes.config.pvcName
+  "namespace" (index . "sonarr-4k").namespace
+  "appName" "sonarr-4k"
+)}}
+{{- end }}

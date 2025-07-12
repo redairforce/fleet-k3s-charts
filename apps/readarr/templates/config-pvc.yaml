@@ -1,0 +1,33 @@
+{{- define "readarr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+
+---
+
+{{- $root := . -}}
+{{- with .Values }}
+{{- include "readarr.configPvc" (dict 
+    "pvcName" .volumes.config.pvcNameLonghornAudio 
+    "namespace" .namespace
+    "appName" "readarr-audio"
+) }}
+---
+{{- include "readarr.configPvc" (dict 
+    "pvcName" .volumes.config.pvcNameLonghornEbook 
+    "namespace" .namespace
+    "appName" "readarr-ebook"
+) }}
+{{- end }}

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sabnzbd.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: sabnzbd
+    version: {{ .Values.image.tag }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: sabnzbd
+  template:
+    metadata:
+      labels:
+        app: sabnzbd
+        version: {{ .Values.image.tag }}
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: sabnzbd
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: PUID
+          value: "{{ .Values.env.puid }}"
+        - name: PGID
+          value: "{{ .Values.env.pgid }}"
+        - name: TZ
+          value: "{{ .Values.env.tz }}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .Values.volumes.config.subPath }}
+        - name: downloads
+          mountPath: /downloads
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.config.pvcName }}
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.downloads.pvcName }}
+      restartPolicy: Always
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"

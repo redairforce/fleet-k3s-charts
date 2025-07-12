@@ -1,0 +1,5 @@
+apiVersion: v2
+name: tdarr
+description: A Helm chart for deploying Tdarr Server with Cloudflare Tunnels and NFS shares
+version: 0.1.0
+appVersion: "2.24.04"

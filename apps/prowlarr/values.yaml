@@ -1,0 +1,50 @@
+hostname: "prowlarr.williamchambless.com"
+replicaCount: 1
+namespace: "arr"
+
+image:
+  repository: "lscr.io/linuxserver/prowlarr"
+  tag: "develop"
+  pullPolicy: IfNotPresent
+
+env:
+  puid: "1000"
+  pgid: "1000"
+  tz: "America/Chicago"
+
+service:
+  type: ClusterIP
+  port: 9696
+
+volumes:
+  config:
+    pvcName: prowlarr-config
+    pvcNameLonghorn: "prowlarr-config-pvc"
+    subPath: prowlarr
+
+postgres:
+  user: "arruser"
+  port: "5432"
+  host: "postgresql.arr.svc.cluster.local"
+  mainDb: "prowlarr_main"
+  logDb: "prowlarr_log"
+
+healthcheck:
+  startPeriod: 60
+  interval: 60
+  timeout: 10
+  retries: 3
+
+resources:
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+  requests:
+    memory: "128Mi"
+    cpu: "250m"
+
+persistence:
+  config:
+    enabled: true
+    size: 5Gi
+    storageClass: longhorn-nvme

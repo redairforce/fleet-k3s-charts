@@ -1,0 +1,5 @@
+apiVersion: v2
+appVersion: develop
+description: A Helm chart for deploying Readarr with Longhorn PVCs
+name: readarr
+version: 0.1.0

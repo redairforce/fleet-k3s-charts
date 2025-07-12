@@ -1,0 +1,5 @@
+apiVersion: v2
+name: tautulli
+description: A Helm chart for deploying Tautulli with persistent storage
+version: 0.1.0
+appVersion: "latest"

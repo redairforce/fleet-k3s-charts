@@ -1,0 +1,60 @@
+replicaCount: 1
+namespace: tdarr
+hostname: tdarr.williamchambless.com
+
+image:
+  repository: docker.io/haveagitgat/tdarr
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  tz: "America/Chicago"
+  puid: "1000"
+  pgid: "1000"
+  umaskSet: "002"
+  serverIP: "0.0.0.0"
+  serverPort: "8266"
+  webUIPort: "8265"
+  internalNode: "true"
+  inContainer: "true"
+  ffmpegVersion: "7"
+  nodeName: "node02"
+  auth: "false"  # Updated to match Compose file
+
+service:
+  type: ClusterIP
+  port: 8265
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+resources:
+  limits:
+    cpu: "14000m"
+    memory: "14Gi"
+  requests:
+    cpu: "1000m"
+    memory: "2Gi"
+
+persistence:
+  internal:
+    enabled: true
+    pvcName: tdarr-internal-pvc
+    subPath: tdarr
+  movies:
+    enabled: true
+    pvcName: tdarr-movies-pvc
+  series:
+    enabled: true
+    pvcName: tdarr-series-pvc
+  ramdisk:
+    enabled: true
+    type: tmpfs
+    mountPath: /temp
+    sizeLimit: 25Gi
+
+nodeSelector:
+  kubernetes.io/hostname: node02

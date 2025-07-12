@@ -1,0 +1,29 @@
+{{- define "channels.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+  labels:
+    {{- include "channels.labels" .context | nindent 4 }}
+spec:
+  type: {{ .serviceType | default "ClusterIP" }}
+  selector:
+    {{- include "channels.selectorLabels" .context | nindent 4 }}
+  ports:
+  - protocol: TCP
+    port: 8089
+    targetPort: 8089
+    name: webui
+{{- end }}
+
+---
+
+{{- with .Values }}
+{{- include "channels.service" (dict 
+  "name" "channels-dvr" 
+  "namespace" .namespace 
+  "serviceType" .service.type
+  "context" $
+) }}
+{{- end }}

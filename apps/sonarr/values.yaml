@@ -1,0 +1,137 @@
+sonarr-1080:
+  hostname: "sonarr-1080.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+
+  config:
+    xml:
+      config.xml: |
+        <Config>
+          <BindAddress>*</BindAddress>
+          <Port>8989</Port>
+          <SslPort>9899</SslPort>
+          <EnableSsl>False</EnableSsl>
+          <LaunchBrowser>True</LaunchBrowser>
+          <ApiKey>3a6d23001ef34fb9b9f93dffd35b133a</ApiKey>
+          <AuthenticationMethod>None</AuthenticationMethod>
+          <AuthenticationRequired>Enabled</AuthenticationRequired>
+          <Branch>develop</Branch>
+          <LogLevel>debug</LogLevel>
+          <SslCertPath></SslCertPath>
+          <SslCertPassword></SslCertPassword>
+          <UrlBase></UrlBase>
+          <InstanceName>Sonarr</InstanceName>
+          <UpdateMechanism>Docker</UpdateMechanism>
+          <PostgresUser>arruser</PostgresUser>
+          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPort>5432</PostgresPort>
+          <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+          <PostgresMainDb>sonarr_1080_main</PostgresMainDb>
+          <PostgresLogDb>sonarr_1080_log</PostgresLogDb>
+        </Config>
+
+  image:
+    repository: "ghcr.io/linuxserver/sonarr"
+    tag: "develop"
+    pullPolicy: IfNotPresent
+
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+
+  service:
+    type: ClusterIP
+    port: 8989
+
+  volumes:
+    config:
+      pvcName: "sonarr-1080-pvc"
+      subPath: sonarr-1080
+    series:
+      pvcName: arr-series-pvc
+    downloads:
+      pvcName: arr-downloads-pvc
+
+  healthcheck:
+    startPeriod: 30
+    interval: 30
+    timeout: 5
+    retries: 3
+
+  resources:
+    limits:
+      memory: "1024Mi"  # Aligned with Radarr
+      cpu: "1000m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+sonarr-4k:
+  hostname: "sonarr-4k.williamchambless.com"
+  replicaCount: 1
+  namespace: "arr"
+
+  config:
+    xml:
+      config.xml: |
+        <Config>
+          <BindAddress>*</BindAddress>
+          <Port>8989</Port>
+          <SslPort>9899</SslPort>
+          <EnableSsl>False</EnableSsl>
+          <LaunchBrowser>True</LaunchBrowser>
+          <ApiKey>4b7e34002fg45gc0c0g04eggf46c244b</ApiKey>
+          <AuthenticationMethod>None</AuthenticationMethod>
+          <AuthenticationRequired>Enabled</AuthenticationRequired>
+          <Branch>develop</Branch>
+          <LogLevel>debug</LogLevel>
+          <SslCertPath></SslCertPath>
+          <SslCertPassword></SslCertPassword>
+          <UrlBase></UrlBase>
+          <InstanceName>Sonarr</InstanceName>
+          <UpdateMechanism>Docker</UpdateMechanism>
+          <PostgresUser>arruser</PostgresUser>
+          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPort>5432</PostgresPort>
+          <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
+          <PostgresMainDb>sonarr_4k_main</PostgresMainDb>
+          <PostgresLogDb>sonarr_4k_log</PostgresLogDb>
+        </Config>
+
+  image:
+    repository: "ghcr.io/linuxserver/sonarr"  # Standardized repository
+    tag: "develop"
+    pullPolicy: IfNotPresent
+
+  env:
+    puid: "1000"
+    pgid: "1000"
+    tz: "America/Chicago"
+
+  service:
+    type: ClusterIP
+    port: 8989
+
+  volumes:
+    config:
+      pvcName: "sonarr-4k-pvc"
+      subPath: sonarr-4k
+    series:
+      pvcName: arr-series-pvc
+    downloads:
+      pvcName: arr-downloads-pvc
+
+  healthcheck:
+    startPeriod: 30  # Aligned with Radarr
+    interval: 30
+    timeout: 5
+    retries: 3
+
+  resources:
+    limits:
+      memory: "1024Mi"  # Aligned with Radarr
+      cpu: "1000m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
