@@ -8,7 +8,7 @@ metadata:
   name: {{ $instance }}-config
   namespace: {{ .namespace }}
 data:
-  {{- range $path, $content := .config.ini }}
+  {{- range $path, $content := .config.yaml }}
   {{ $path }}: |
 {{ $content | indent 4 }}
   {{- end }}

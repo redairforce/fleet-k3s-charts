@@ -1,0 +1,10 @@
+# Fleet values override file for Cloudflare DDNS
+# This file can be used to override default values for Fleet deployment
+
+global:
+  domain: "williamchambless.com"
+
+cloudflare:
+  zone: "williamchambless.com"
+  subdomain: home
+  proxied: true

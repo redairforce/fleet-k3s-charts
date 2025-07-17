@@ -13,11 +13,11 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ index .Values "sonarr-1080" "hostname" }}
-        - {{ index .Values "sonarr-4k" "hostname" }}
+        - sonarr-1080.{{ .Values.global.domain }}
+        - sonarr-4k.{{ .Values.global.domain }}
       secretName: sonarr-tls
   rules:
-    - host: {{ index .Values "sonarr-1080" "hostname" }}
+    - host: sonarr-1080.{{ .Values.global.domain }}
       http:
         paths:
           - path: /
@@ -27,7 +27,7 @@ spec:
                 name: sonarr-1080
                 port:
                   number: 8989
-    - host: {{ index .Values "sonarr-4k" "hostname" }}
+    - host: sonarr-4k.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

@@ -1,4 +1,4 @@
-hostname: "sabnzbd.williamchambless.com"
+hostname: "sabnzbd.CHANGE_ME_DOMAIN"
 replicaCount: 1
 namespace: "downloader"
 
@@ -40,3 +40,4 @@ resources:
 # Node selector for dedicated download node
 nodeSelector:
   kubernetes.io/hostname: node01
+

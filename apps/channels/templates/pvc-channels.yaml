@@ -19,7 +19,7 @@ spec:
 
 {{- with .Values }}
 {{- include "channels.configPvc" (dict 
-    "pvcName" (printf "%s-config" (include "channels.fullname" $))
+    "pvcName" .volumes.config.pvcName
     "namespace" .namespace
     "storageSize" .pvc.size
     "storageClassName" .pvc.storageClassName

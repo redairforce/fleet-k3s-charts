@@ -1,5 +1,5 @@
 sonarr-1080:
-  hostname: "sonarr-1080.williamchambless.com"
+  hostname: "sonarr-1080.CHANGE_ME_DOMAIN"
   replicaCount: 1
   namespace: "arr"
 
@@ -12,7 +12,7 @@ sonarr-1080:
           <SslPort>9899</SslPort>
           <EnableSsl>False</EnableSsl>
           <LaunchBrowser>True</LaunchBrowser>
-          <ApiKey>3a6d23001ef34fb9b9f93dffd35b133a</ApiKey>
+          <ApiKey>SONARR_1080_API_KEY_PLACEHOLDER</ApiKey>
           <AuthenticationMethod>None</AuthenticationMethod>
           <AuthenticationRequired>Enabled</AuthenticationRequired>
           <Branch>develop</Branch>
@@ -23,7 +23,7 @@ sonarr-1080:
           <InstanceName>Sonarr</InstanceName>
           <UpdateMechanism>Docker</UpdateMechanism>
           <PostgresUser>arruser</PostgresUser>
-          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPassword>POSTGRES_PASSWORD_PLACEHOLDER</PostgresPassword>
           <PostgresPort>5432</PostgresPort>
           <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
           <PostgresMainDb>sonarr_1080_main</PostgresMainDb>
@@ -68,7 +68,7 @@ sonarr-1080:
       cpu: "250m"
 
 sonarr-4k:
-  hostname: "sonarr-4k.williamchambless.com"
+  hostname: "sonarr-4k.CHANGE_ME_DOMAIN"
   replicaCount: 1
   namespace: "arr"
 
@@ -81,7 +81,7 @@ sonarr-4k:
           <SslPort>9899</SslPort>
           <EnableSsl>False</EnableSsl>
           <LaunchBrowser>True</LaunchBrowser>
-          <ApiKey>4b7e34002fg45gc0c0g04eggf46c244b</ApiKey>
+          <ApiKey>SONARR_4K_API_KEY_PLACEHOLDER</ApiKey>
           <AuthenticationMethod>None</AuthenticationMethod>
           <AuthenticationRequired>Enabled</AuthenticationRequired>
           <Branch>develop</Branch>
@@ -92,7 +92,7 @@ sonarr-4k:
           <InstanceName>Sonarr</InstanceName>
           <UpdateMechanism>Docker</UpdateMechanism>
           <PostgresUser>arruser</PostgresUser>
-          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPassword>POSTGRES_PASSWORD_PLACEHOLDER</PostgresPassword>
           <PostgresPort>5432</PostgresPort>
           <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
           <PostgresMainDb>sonarr_4k_main</PostgresMainDb>
@@ -100,7 +100,7 @@ sonarr-4k:
         </Config>
 
   image:
-    repository: "ghcr.io/linuxserver/sonarr"  # Standardized repository
+    repository: "ghcr.io/linuxserver/sonarr"
     tag: "develop"
     pullPolicy: IfNotPresent
 
@@ -123,15 +123,16 @@ sonarr-4k:
       pvcName: arr-downloads-pvc
 
   healthcheck:
-    startPeriod: 30  # Aligned with Radarr
+    startPeriod: 30
     interval: 30
     timeout: 5
     retries: 3
 
   resources:
     limits:
-      memory: "1024Mi"  # Aligned with Radarr
+      memory: "1024Mi"
       cpu: "1000m"
     requests:
       memory: "256Mi"
       cpu: "250m"
+

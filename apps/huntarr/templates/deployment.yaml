@@ -85,11 +85,11 @@ spec:
 ---
 {{- include "huntarr.deployment" (dict
   "name" "huntarr"
-  "namespace" .Values.huntarr.namespace
-  "replicaCount" .Values.huntarr.replicaCount
-  "image" .Values.huntarr.image
-  "env" .Values.huntarr.env
-  "volumes" .Values.huntarr.volumes
-  "healthcheck" .Values.huntarr.healthcheck
-  "resources" .Values.huntarr.resources
+  "namespace" .Values.namespace
+  "replicaCount" .Values.replicaCount
+  "image" .Values.image
+  "env" .Values.env
+  "volumes" .Values.volumes
+  "healthcheck" .Values.healthcheck
+  "resources" .Values.resources
 )}}

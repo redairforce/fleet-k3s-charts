@@ -13,10 +13,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ .Values.hostname }}
+        - prowlarr.{{ .Values.global.domain }}
       secretName: prowlarr-tls
   rules:
-    - host: {{ .Values.hostname }}
+    - host: prowlarr.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

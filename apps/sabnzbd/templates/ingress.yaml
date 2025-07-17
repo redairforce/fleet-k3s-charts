@@ -12,10 +12,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ .Values.hostname }}
+        - sabnzbd.{{ .Values.global.domain }}
       secretName: sabnzbd-tls
   rules:
-    - host: {{ .Values.hostname }}
+    - host: sabnzbd.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

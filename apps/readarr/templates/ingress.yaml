@@ -13,11 +13,11 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ .Values.readarrAudio.hostname }}
-        - {{ .Values.readarrEbook.hostname }}
+        - readarr-audio.{{ .Values.global.domain }}
+        - readarr-ebook.{{ .Values.global.domain }}
       secretName: readarr-tls
   rules:
-    - host: {{ .Values.readarrAudio.hostname }}
+    - host: readarr-audio.{{ .Values.global.domain }}
       http:
         paths:
           - path: /
@@ -27,7 +27,7 @@ spec:
                 name: readarr-audio
                 port:
                   number: 8787
-    - host: {{ .Values.readarrEbook.hostname }}
+    - host: readarr-ebook.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

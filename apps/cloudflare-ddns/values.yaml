@@ -10,7 +10,7 @@ cloudflare:
   apiToken: ""  # base64-encoded automatically by Helm if secret is created
 
   # Required fields:
-  zone: williamchambless.com
+  zone: "CHANGE_ME_DOMAIN"
   subdomain: home
   proxied: true
 
@@ -26,3 +26,4 @@ resources: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
+

@@ -1,1 +1,35 @@
-hostname: "tautulli.williamchambless.com"
+tautulli:
+  namespace: web
+  replicaCount: 1
+  image:
+    repository: lscr.io/linuxserver/tautulli
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8181
+  env:
+    puid: 1000
+    pgid: 1000
+    tz: UTC
+  volumes:
+    config:
+      subPath: ""
+      pvcName: tautulli-pvc
+  healthcheck:
+    startPeriod: 30
+    interval: 10
+    timeout: 5
+    retries: 3
+  resources: {}
+  pvc:
+    size: 10Gi
+    storageClassName: longhorn-nvme
+  hostname: tautulli.CHANGE_ME_DOMAIN
+  config:
+    ini:
+      config.ini: |
+        [General]
+        http_host = 0.0.0.0
+        http_port = 8181
+

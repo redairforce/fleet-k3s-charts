@@ -1,0 +1,37 @@
+hostname: "cleanuparr.CHANGE_ME_DOMAIN"
+replicaCount: 1
+namespace: "arr"
+
+image:
+  repository: "ghcr.io/cleanuparr/cleanuparr"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+env:
+  puid: 1000
+  pgid: 1000
+  tz: "Etc/UTC"
+
+service:
+  type: ClusterIP
+  port: 11011
+
+volumes:
+  config:
+    pvcName: "cleanuparr-pvc"
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+resources:
+  limits:
+    memory: "512Mi"
+    cpu: "1000m"
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+
+# Secret references

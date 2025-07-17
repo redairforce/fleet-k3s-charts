@@ -1,28 +1,24 @@
 bazarr-1080:
-  hostname: "bazarr-1080.williamchambless.com"
   replicaCount: 1
   namespace: "arr"
 
   config:
-    ini:
-      config.ini: |
-        [general]
-        port = 6767
-        ip = 0.0.0.0
-        base_url = /
-        auth_type = None
-        auth_username =
-        auth_password =
-        branch = master
-        auto_update = 0
-        log_level = DEBUG
-        [postgres]
-        enabled = True
-        host = postgresql.arr.svc.cluster.local
-        port = 5432
-        database = bazarr_1080
-        username = arruser
-        password = XKUS1t1YsTGI1J
+    yaml:
+      config.yaml: |
+        postgresql:
+          database: bazarr_1080
+          enabled: true
+          host: postgresql.arr.svc.cluster.local
+          password: POSTGRES_PASSWORD_PLACEHOLDER
+          port: 5432
+          username: arruser
+        general:
+          port: 6767
+          ip: '*'
+          base_url: ''
+          branch: master
+          auto_update: true
+          debug: false
 
   image:
     repository: "ghcr.io/linuxserver/bazarr"
@@ -64,30 +60,26 @@ bazarr-1080:
       cpu: "250m"
 
 bazarr-4k:
-  hostname: "bazarr-4k.williamchambless.com"
   replicaCount: 1
   namespace: "arr"
 
   config:
-    ini:
-      config.ini: |
-        [general]
-        port = 6767
-        ip = 0.0.0.0
-        base_url = /
-        auth_type = None
-        auth_username =
-        auth_password =
-        branch = master
-        auto_update = 0
-        log_level = DEBUG
-        [postgres]
-        enabled = True
-        host = postgresql.arr.svc.cluster.local
-        port = 5432
-        database = bazarr_4k
-        username = arruser
-        password = XKUS1t1YsTGI1J
+    yaml:
+      config.yaml: |
+        postgresql:
+          database: bazarr_4k
+          enabled: true
+          host: postgresql.arr.svc.cluster.local
+          password: POSTGRES_PASSWORD_PLACEHOLDER
+          port: 5432
+          username: arruser
+        general:
+          port: 6767
+          ip: '*'
+          base_url: ''
+          branch: master
+          auto_update: true
+          debug: false
 
   image:
     repository: "ghcr.io/linuxserver/bazarr"
@@ -127,3 +119,15 @@ bazarr-4k:
     requests:
       memory: "256Mi"
       cpu: "250m"
+
+# Secret references
+# Domain configuration - override this value in Fleet
+global:
+  domain: "CHANGE_ME_DOMAIN"
+
+postgres:
+  password: 
+    valueFrom:
+      secretKeyRef:
+        name: postgres-credentials
+        key: password

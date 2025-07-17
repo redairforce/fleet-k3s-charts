@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-openvscode-server
+  name: openvscode
   namespace: {{ .Values.namespace }}
   labels:
     app: openvscode-server
@@ -38,16 +38,50 @@ spec:
           value: "{{ .Values.env.nodejsModVersion }}"
         volumeMounts:
         - name: config
-          mountPath: /config
+          mountPath: {{ .Values.persistence.config.mountPath }}
         - name: docker-sock
           mountPath: /var/run/docker.sock
           readOnly: true
         - name: appdata
           mountPath: /mnt/appdata
+        {{- if .Values.healthcheck.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
       volumes:
+      {{- if .Values.persistence.config.enabled }}
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.config.pvcName }}
+      {{- else }}
       - name: config
         hostPath:
           path: /mnt/appdata/utilities/openvscode-server/config
+      {{- end }}
       - name: docker-sock
         hostPath:
           path: /var/run/docker.sock

@@ -1,0 +1,12 @@
+# Fleet values override file
+# This file can be used to override default values for Fleet deployment
+
+global:
+  domain: "williamchambless.com"
+
+# You can also override other values here as needed
+# For example:
+# bazarr-1080:
+#   resources:
+#     limits:
+#       memory: "1Gi"

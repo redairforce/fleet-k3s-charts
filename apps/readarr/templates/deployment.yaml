@@ -35,16 +35,35 @@ spec:
           ls -la /tmp/readarr-config/
           echo "Source config content:"
           cat /tmp/readarr-config/config.xml
-          echo "Copying config if needed..."
-          if [ ! -f /config/config.xml ]; then
-            cp /tmp/readarr-config/config.xml /config/config.xml
-            echo "Config copied. Verifying..."
-            ls -la /config/config.xml
-            echo "Destination content:"
-            cat /config/config.xml
-          else
-            echo "Config already exists"
-          fi
+          echo "Processing config with secret substitution..."
+          # Always substitute environment variables in case secrets changed
+          sed -e "s/POSTGRES_PASSWORD_PLACEHOLDER/$POSTGRES_PASSWORD/g" \
+              -e "s/READARR_AUDIO_API_KEY_PLACEHOLDER/$READARR_AUDIO_API_KEY/g" \
+              -e "s/READARR_EBOOK_API_KEY_PLACEHOLDER/$READARR_EBOOK_API_KEY/g" \
+              /tmp/readarr-config/config.xml > /config/config.xml
+          echo "Config updated with secret substitution. Verifying..."
+          ls -la /config/config.xml
+          echo "Destination content (secrets masked):"
+          sed -e 's/<ApiKey>.*<\/ApiKey>/<ApiKey>[MASKED]<\/ApiKey>/g' \
+              -e 's/<PostgresPassword>.*<\/PostgresPassword>/<PostgresPassword>[MASKED]<\/PostgresPassword>/g' \
+              /config/config.xml
+          echo "Secret substitution completed!"
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+        - name: READARR_AUDIO_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-api-keys
+              key: readarr-audio-api-key
+        - name: READARR_EBOOK_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-api-keys
+              key: readarr-ebook-api-key
         volumeMounts:
         - name: config
           mountPath: /config

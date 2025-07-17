@@ -1,5 +1,5 @@
 replicaCount: 1
-namespace: default
+namespace: web
 
 image:
   repository: lscr.io/linuxserver/openvscode-server
@@ -15,3 +15,31 @@ env:
 
 service:
   type: ClusterIP
+  port: 3010
+
+hostname: "openvscode.CHANGE_ME_DOMAIN"
+
+resources:
+  limits:
+    memory: "2Gi"
+    cpu: "1000m"
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+
+healthcheck:
+  enabled: true
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+persistence:
+  config:
+    enabled: true
+    pvcName: openvscode-config-pvc
+    storageClass: longhorn-nvme
+    size: 10Gi
+    mountPath: /config
+
+# Secret references

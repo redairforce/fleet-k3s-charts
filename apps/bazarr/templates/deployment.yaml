@@ -36,17 +36,23 @@ spec:
           echo "Checking source config..."
           ls -la /tmp/bazarr-config/
           echo "Source config content:"
-          cat /tmp/bazarr-config/config.ini
-          echo "Copying config if needed..."
-          if [ ! -f /config/config.ini ]; then
-            cp /tmp/bazarr-config/config.ini /config/config.ini
-            echo "Config copied. Verifying..."
-            ls -la /config/config.ini
-            echo "Destination content:"
-            cat /config/config.ini
-          else
-            echo "Config already exists"
-          fi
+          cat /tmp/bazarr-config/config.yaml
+          echo "Processing config with secret substitution..."
+          # Create config directory structure if it doesn't exist
+          mkdir -p /config/config
+          # Always substitute environment variables in case secrets changed
+          sed "s/POSTGRES_PASSWORD_PLACEHOLDER/$POSTGRES_PASSWORD/g" /tmp/bazarr-config/config.yaml > /config/config/config.yaml
+          echo "Config updated with password substitution. Verifying..."
+          ls -la /config/config/config.yaml
+          echo "Destination content (password masked):"
+          sed 's/password: .*/password: [MASKED]/g' /config/config/config.yaml
+          echo "Secret substitution completed!"
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
         volumeMounts:
         - name: config
           mountPath: /config
@@ -68,6 +74,11 @@ spec:
           value: "{{ .env.pgid }}"
         - name: TZ
           value: "{{ .env.tz }}"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
         volumeMounts:
         - name: config
           mountPath: /config

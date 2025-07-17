@@ -37,16 +37,35 @@ spec:
           ls -la /tmp/radarr-config/
           echo "Source config content:"
           cat /tmp/radarr-config/config.xml
-          echo "Copying config if needed..."
-          if [ ! -f /config/config.xml ]; then
-            cp /tmp/radarr-config/config.xml /config/config.xml
-            echo "Config copied. Verifying..."
-            ls -la /config/config.xml
-            echo "Destination content:"
-            cat /config/config.xml
-          else
-            echo "Config already exists"
-          fi
+          echo "Processing config with secret substitution..."
+          # Always substitute environment variables in case secrets changed
+          sed -e "s/POSTGRES_PASSWORD_PLACEHOLDER/$POSTGRES_PASSWORD/g" \
+              -e "s/RADARR_1080_API_KEY_PLACEHOLDER/$RADARR_1080_API_KEY/g" \
+              -e "s/RADARR_4K_API_KEY_PLACEHOLDER/$RADARR_4K_API_KEY/g" \
+              /tmp/radarr-config/config.xml > /config/config.xml
+          echo "Config updated with secret substitution. Verifying..."
+          ls -la /config/config.xml
+          echo "Destination content (secrets masked):"
+          sed -e 's/<ApiKey>.*<\/ApiKey>/<ApiKey>[MASKED]<\/ApiKey>/g' \
+              -e 's/<PostgresPassword>.*<\/PostgresPassword>/<PostgresPassword>[MASKED]<\/PostgresPassword>/g' \
+              /config/config.xml
+          echo "Secret substitution completed!"
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+        - name: RADARR_1080_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-api-keys
+              key: radarr-1080-api-key
+        - name: RADARR_4K_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-api-keys
+              key: radarr-4k-api-key
         volumeMounts:
         - name: config
           mountPath: /config

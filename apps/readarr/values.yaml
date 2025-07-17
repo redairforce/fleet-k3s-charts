@@ -1,5 +1,5 @@
 readarrAudio:
-  hostname: "readarr-audio.williamchambless.com"
+  hostname: "readarr-audio.CHANGE_ME_DOMAIN"
   image:
     repository: lscr.io/linuxserver/readarr
     tag: 0.4.18-develop
@@ -17,7 +17,7 @@ readarrAudio:
           <SslPort>9897</SslPort>
           <EnableSsl>False</EnableSsl>
           <LaunchBrowser>True</LaunchBrowser>
-          <ApiKey>2f5c12001df24fa8a8f82cfece24a22c</ApiKey>
+          <ApiKey>READARR_AUDIO_API_KEY_PLACEHOLDER</ApiKey>
           <AuthenticationMethod>None</AuthenticationMethod>
           <AuthenticationRequired>Enabled</AuthenticationRequired>
           <Branch>develop</Branch>
@@ -28,7 +28,7 @@ readarrAudio:
           <InstanceName>ReadarrAudio</InstanceName>
           <UpdateMechanism>Docker</UpdateMechanism>
           <PostgresUser>arruser</PostgresUser>
-          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPassword>POSTGRES_PASSWORD_PLACEHOLDER</PostgresPassword>
           <PostgresPort>5432</PostgresPort>
           <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
           <PostgresMainDb>readarr_audio_main</PostgresMainDb>
@@ -37,7 +37,7 @@ readarrAudio:
         </Config>
 
 readarrEbook:
-  hostname: "readarr-ebook.williamchambless.com"
+  hostname: "readarr-ebook.CHANGE_ME_DOMAIN"
   image:
     repository: lscr.io/linuxserver/readarr
     tag: 0.4.18-develop
@@ -55,7 +55,7 @@ readarrEbook:
           <SslPort>9897</SslPort>
           <EnableSsl>False</EnableSsl>
           <LaunchBrowser>True</LaunchBrowser>
-          <ApiKey>2f5c12001df24fa8a8f82cfece24a22d</ApiKey>
+          <ApiKey>READARR_EBOOK_API_KEY_PLACEHOLDER</ApiKey>
           <AuthenticationMethod>None</AuthenticationMethod>
           <AuthenticationRequired>Enabled</AuthenticationRequired>
           <Branch>develop</Branch>
@@ -66,7 +66,7 @@ readarrEbook:
           <InstanceName>ReadarrEbook</InstanceName>
           <UpdateMechanism>Docker</UpdateMechanism>
           <PostgresUser>arruser</PostgresUser>
-          <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+          <PostgresPassword>POSTGRES_PASSWORD_PLACEHOLDER</PostgresPassword>
           <PostgresPort>5432</PostgresPort>
           <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
           <PostgresMainDb>readarr_ebook_main</PostgresMainDb>

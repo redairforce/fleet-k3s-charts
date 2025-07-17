@@ -1,12 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "tautulli.fullname" . }}
-  namespace: {{ .Values.namespace }}
-  labels:
-    app: tautulli
+  name: tautulli
+  namespace: {{ .Values.tautulli.namespace }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.tautulli.replicaCount }}
   selector:
     matchLabels:
       app: tautulli
@@ -14,45 +12,81 @@ spec:
     metadata:
       labels:
         app: tautulli
+        version: {{ .Values.tautulli.image.tag }}
       annotations:
-        diun.enable: "true"
         autoheal: "true"
+        diun.enable: "true"
     spec:
-      containers:
-      - name: tautulli
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - containerPort: {{ .Values.service.port }}
-        env:
-        - name: PUID
-          value: "{{ .Values.env.puid }}"
-        - name: PGID
-          value: "{{ .Values.env.pgid }}"
-        - name: TZ
-          value: "{{ .Values.env.tz }}"
+      initContainers:
+      - name: init-config
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          echo "Checking source config..."
+          ls -la /tmp/tautulli-config/
+          echo "Source config content:"
+          cat /tmp/tautulli-config/config.ini
+          echo "Copying config if needed..."
+          if [ ! -f /config/config.ini ]; then
+            cp /tmp/tautulli-config/config.ini /config/config.ini
+            echo "Config copied. Verifying..."
+            ls -la /config/config.ini
+            echo "Destination content:"
+            cat /config/config.ini
+          else
+            echo "Config already exists"
+          fi
         volumeMounts:
         - name: config
           mountPath: /config
-          subPath: {{ .Values.volumes.config.subPath }}
+        - name: tautulli-config
+          mountPath: /tmp/tautulli-config
+      containers:
+      - name: tautulli
+        image: {{ .Values.tautulli.image.repository }}:{{ .Values.tautulli.image.tag }}
+        imagePullPolicy: {{ .Values.tautulli.image.pullPolicy }}
+        ports:
+        - containerPort: 8181
+        env:
+        - name: PUID
+          value: "{{ .Values.tautulli.env.puid }}"
+        - name: PGID
+          value: "{{ .Values.tautulli.env.pgid }}"
+        - name: TZ
+          value: "{{ .Values.tautulli.env.tz }}"
+        volumeMounts:
+        - name: config
+          mountPath: /config
         livenessProbe:
           httpGet:
             path: /
-            port: {{ .Values.service.port }}
-          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
-          periodSeconds: {{ .Values.healthcheck.interval }}
-          timeoutSeconds: {{ .Values.healthcheck.timeout }}
-          failureThreshold: {{ .Values.healthcheck.retries }}
+            port: 8181
+          initialDelaySeconds: {{ .Values.tautulli.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.tautulli.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.tautulli.healthcheck.timeout }}
+          failureThreshold: {{ .Values.tautulli.healthcheck.retries }}
         readinessProbe:
           httpGet:
             path: /
-            port: {{ .Values.service.port }}
-          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
-          periodSeconds: {{ .Values.healthcheck.interval }}
-          timeoutSeconds: {{ .Values.healthcheck.timeout }}
-          failureThreshold: {{ .Values.healthcheck.retries }}
+            port: 8181
+          initialDelaySeconds: {{ .Values.tautulli.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.tautulli.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.tautulli.healthcheck.timeout }}
+          failureThreshold: {{ .Values.tautulli.healthcheck.retries }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8181
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 30
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: tautulli-pvc
-      restartPolicy: Always
+          claimName: {{ .Values.tautulli.volumes.config.pvcName }}
+      - name: tautulli-config
+        configMap:
+          name: tautulli-config

@@ -19,7 +19,7 @@ spec:
 ---
 {{- include "huntarr.service" (dict
   "name" "huntarr"
-  "namespace" .Values.huntarr.namespace
-  "serviceType" .Values.huntarr.service.type
-  "servicePort" .Values.huntarr.service.port
+  "namespace" .Values.namespace
+  "serviceType" .Values.service.type
+  "servicePort" .Values.service.port
 )}}

@@ -1,4 +1,82 @@
+# Kubernetes Secrets (NEVER commit these!)
+secrets.yaml
+secrets-*.yaml
+*-secrets.yaml
+**/secrets/
+**/secret/
+
+# Temporary files with real secrets
+secrets-template.yaml
+**/temp-secrets/
+**/backup-secrets/
+
+# Original sensitive directories
 sensitive-values/
 *.secret.yaml
 backups/
 dry-runs/
+
+# Fleet values override files with real domains (optional - you can choose to commit these)
+# Uncomment the lines below if you want to keep domain info private
+# **/fleet-values.yaml
+# fleet-values-*.yaml
+
+# Helm temporary files
+*.tgz
+charts/
+Chart.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Any file containing actual API keys, passwords, or tokens
+*apikey*
+*password*
+*token*
+*credential*
+
+# Development and testing
+test-secrets/
+dev-secrets/
+local-secrets/
+
+# Personal notes or documentation with sensitive info
+NOTES.md
+TODO.md
+personal-*
+private-*
+
+# Exported/imported files from our cleanup
+exported.txt
+import.txt
+scrubbed.txt
+scrubbed_apps/
+export_import.sh

@@ -1,4 +1,4 @@
-hostname: "prowlarr.williamchambless.com"
+hostname: "prowlarr.CHANGE_ME_DOMAIN"
 replicaCount: 1
 namespace: "arr"
 
@@ -48,3 +48,4 @@ persistence:
     enabled: true
     size: 5Gi
     storageClass: longhorn-nvme
+

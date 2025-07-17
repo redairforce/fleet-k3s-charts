@@ -15,6 +15,47 @@ spec:
           imagePullSecrets:
             - name: {{ .Values.image.pullSecret }}
           {{- end }}
+          initContainers:
+            - name: init-config
+              image: busybox
+              command: 
+              - sh
+              - -c
+              - |
+                echo "Processing config with secret substitution..."
+                # Substitute API key placeholders with actual secrets
+                sed -e "s/SONARR_1080_API_KEY_PLACEHOLDER/$SONARR_1080_API_KEY/g" \
+                    -e "s/SONARR_4K_API_KEY_PLACEHOLDER/$SONARR_4K_API_KEY/g" \
+                    -e "s/RADARR_1080_API_KEY_PLACEHOLDER/$RADARR_1080_API_KEY/g" \
+                    -e "s/RADARR_4K_API_KEY_PLACEHOLDER/$RADARR_4K_API_KEY/g" \
+                    /tmp/config-template/config.yml > /shared/config.yml
+                echo "Config processing completed"
+              env:
+                - name: SONARR_1080_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-api-keys
+                      key: sonarr-1080-api-key
+                - name: SONARR_4K_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-api-keys
+                      key: sonarr-4k-api-key
+                - name: RADARR_1080_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-api-keys
+                      key: radarr-1080-api-key
+                - name: RADARR_4K_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-api-keys
+                      key: radarr-4k-api-key
+              volumeMounts:
+                - name: config-volume
+                  mountPath: /tmp/config-template
+                - name: shared-config
+                  mountPath: /shared
           containers:
             - name: configarr
               image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -25,7 +66,7 @@ spec:
                 - mountPath: /app/repos
                   name: app-data
                   subPath: configarr-repos
-                - name: config-volume
+                - name: shared-config
                   mountPath: /app/config/config.yml
                   subPath: config.yml
           volumes:
@@ -35,4 +76,6 @@ spec:
             - name: config-volume
               configMap:
                 name: configarr
+            - name: shared-config
+              emptyDir: {}
           restartPolicy: Never

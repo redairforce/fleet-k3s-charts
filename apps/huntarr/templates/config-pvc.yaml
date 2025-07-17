@@ -17,7 +17,7 @@ spec:
 {{- end }}
 ---
 {{- include "huntarr.configPvc" (dict
-  "pvcName" .Values.huntarr.volumes.config.pvcName
-  "namespace" .Values.huntarr.namespace
+  "pvcName" .Values.volumes.config.pvcName
+  "namespace" .Values.namespace
   "appName" "huntarr"
 )}}

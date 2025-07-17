@@ -1,6 +1,6 @@
 replicaCount: 1
 namespace: tdarr
-hostname: tdarr.williamchambless.com
+hostname: tdarr.CHANGE_ME_DOMAIN
 
 image:
   repository: docker.io/haveagitgat/tdarr
@@ -58,3 +58,5 @@ persistence:
 
 nodeSelector:
   kubernetes.io/hostname: node02
+
+# Secret references

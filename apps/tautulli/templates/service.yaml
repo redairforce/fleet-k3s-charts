@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tautulli
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.tautulli.namespace }}
   labels:
     app: tautulli
 spec:
+  type: {{ .Values.tautulli.service.type }}
   selector:
     app: tautulli
   ports:
   - protocol: TCP
-    port: {{ .Values.service.port }}
-    targetPort: {{ .Values.service.port }}
+    port: {{ .Values.tautulli.service.port }}
+    targetPort: {{ .Values.tautulli.service.port }}
     name: http
-  type: {{ .Values.service.type }}

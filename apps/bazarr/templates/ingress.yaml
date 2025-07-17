@@ -13,11 +13,11 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ index .Values "bazarr-1080" "hostname" }}
-        - {{ index .Values "bazarr-4k" "hostname" }}
+        - bazarr-1080.{{ .Values.global.domain }}
+        - bazarr-4k.{{ .Values.global.domain }}
       secretName: bazarr-tls
   rules:
-    - host: {{ index .Values "bazarr-1080" "hostname" }}
+    - host: bazarr-1080.{{ .Values.global.domain }}
       http:
         paths:
           - path: /
@@ -27,7 +27,7 @@ spec:
                 name: bazarr-1080
                 port:
                   number: 6767
-    - host: {{ index .Values "bazarr-4k" "hostname" }}
+    - host: bazarr-4k.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

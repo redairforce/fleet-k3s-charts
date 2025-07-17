@@ -1,0 +1,60 @@
+{{- if .Values.vuetorrent.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qbittorrent-config
+  namespace: {{ .Values.namespace }}
+data:
+  qBittorrent.conf: |
+    [Application]
+    FileLogger\Age=1
+    FileLogger\AgeType=1
+    FileLogger\Backup=true
+    FileLogger\DeleteOld=true
+    FileLogger\Enabled=true
+    FileLogger\MaxSizeBytes=66560
+    FileLogger\Path=/config/qBittorrent/logs
+
+    [BitTorrent]
+    Session\AddTorrentStopped=false
+    Session\DefaultSavePath=/downloads
+    Session\ExcludedFileNames=
+    Session\GlobalDLSpeedLimit=10000
+    Session\GlobalUPSpeedLimit=10000
+    Session\MaxUploads=8
+    Session\Port=22854
+    Session\ProxyPeerConnections=true
+    Session\QueueingSystemEnabled=true
+    Session\SSL\Port=39020
+    Session\ShareLimitAction=Stop
+
+    [Core]
+    AutoDeleteAddedTorrentFile=Never
+
+    [Meta]
+    MigrationVersion=8
+
+    [Network]
+    Proxy\AuthEnabled=false
+    Proxy\HostnameLookupEnabled=true
+    Proxy\IP=gluetun-socks.vpn.svc.cluster.local
+    Proxy\Password=
+    Proxy\Port=@Variant(\0\0\0\x85\x4\x38)
+    Proxy\Profiles\BitTorrent=true
+    Proxy\Profiles\Misc=true
+    Proxy\Profiles\RSS=true
+    Proxy\Type=SOCKS5
+    Proxy\Username=
+
+    [Preferences]
+    WebUI\AlternativeUIEnabled=true
+    WebUI\AuthSubnetWhitelist=@Invalid()
+    WebUI\Port=8080
+    WebUI\RootFolder=/vuetorrent
+
+    [Preferences]
+    WebUI\AlternativeUIEnabled=true
+    WebUI\RootFolder=/vuetorrent
+    WebUI\Port=8080
+    # Add any other custom qBittorrent settings here (e.g., under [Preferences])
+{{- end }}

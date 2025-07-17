@@ -13,10 +13,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ .Values.hostname }}
+        - channels.{{ .Values.global.domain }}
       secretName: channels-tls
   rules:
-    - host: {{ .Values.hostname }}
+    - host: channels.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

@@ -13,10 +13,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ .Values.hostname }}
+        - lidarr.{{ .Values.global.domain }}
       secretName: lidarr-tls
   rules:
-    - host: {{ .Values.hostname }}
+    - host: lidarr.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

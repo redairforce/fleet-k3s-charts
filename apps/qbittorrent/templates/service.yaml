@@ -1,18 +1,24 @@
-# qbittorrent/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
+  name: qbittorrent
+  namespace: {{ .Values.namespace }}
   labels:
     app: qbittorrent
-    release: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      protocol: TCP
-      name: http
   selector:
     app: qbittorrent
-    release: {{ .Release.Name }}
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    name: webui
+  - protocol: TCP
+    port: 6881
+    targetPort: 6881
+    name: torrent-tcp
+  - protocol: UDP
+    port: 6881
+    targetPort: 6881
+    name: torrent-udp

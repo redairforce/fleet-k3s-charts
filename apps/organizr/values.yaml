@@ -51,14 +51,14 @@ ingress:
       traefik.ingress.kubernetes.io/redirect-entry-point: https
       traefik.ingress.kubernetes.io/redirect-permanent: "true"
     hosts:
-      - host: organizr.williamchambless.com
+      - host: organizr.{{ .Values.global.domain }}
         paths:
           - path: /
             pathType: Prefix
     tls:
       - secretName: organizr-tls
         hosts:
-          - organizr.williamchambless.com
+          - organizr.{{ .Values.global.domain }}
 
 persistence:
   config:
@@ -79,3 +79,5 @@ service:
         port: 80
         protocol: TCP
         targetPort: 80
+
+# Secret references

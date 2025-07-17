@@ -1,0 +1,12 @@
+{{- if .Values.tautulli.config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tautulli-config
+  namespace: {{ .Values.tautulli.namespace }}
+data:
+  {{- range $path, $content := .Values.tautulli.config.ini }}
+  {{ $path }}: |
+{{ $content | indent 4 }}
+  {{- end }}
+{{- end }}

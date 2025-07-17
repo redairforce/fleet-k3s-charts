@@ -1,4 +1,4 @@
-hostname: "channels.williamchambless.com"
+hostname: "channels.CHANGE_ME_DOMAIN"
 namespace: "arr"
 replicaCount: 1
 
@@ -42,3 +42,5 @@ healthcheck:
   interval: 30
   timeout: 5
   retries: 3
+
+# Secret references

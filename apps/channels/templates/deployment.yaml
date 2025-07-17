@@ -79,7 +79,7 @@ spec:
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: {{ include "channels.fullname" . }}-config
+          claimName: {{ .Values.volumes.config.pvcName }}
       - name: dvr
         persistentVolumeClaim:
           claimName: {{ .Values.volumes.dvr.pvcName }}

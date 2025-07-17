@@ -37,16 +37,35 @@ spec:
           ls -la /tmp/sonarr-config/
           echo "Source config content:"
           cat /tmp/sonarr-config/config.xml
-          echo "Copying config if needed..."
-          if [ ! -f /config/config.xml ]; then
-            cp /tmp/sonarr-config/config.xml /config/config.xml
-            echo "Config copied. Verifying..."
-            ls -la /config/config.xml
-            echo "Destination content:"
-            cat /config/config.xml
-          else
-            echo "Config already exists"
-          fi
+          echo "Processing config with secret substitution..."
+          # Always substitute environment variables in case secrets changed
+          sed -e "s/POSTGRES_PASSWORD_PLACEHOLDER/$POSTGRES_PASSWORD/g" \
+              -e "s/SONARR_1080_API_KEY_PLACEHOLDER/$SONARR_1080_API_KEY/g" \
+              -e "s/SONARR_4K_API_KEY_PLACEHOLDER/$SONARR_4K_API_KEY/g" \
+              /tmp/sonarr-config/config.xml > /config/config.xml
+          echo "Config updated with secret substitution. Verifying..."
+          ls -la /config/config.xml
+          echo "Destination content (secrets masked):"
+          sed -e 's/<ApiKey>.*<\/ApiKey>/<ApiKey>[MASKED]<\/ApiKey>/g' \
+              -e 's/<PostgresPassword>.*<\/PostgresPassword>/<PostgresPassword>[MASKED]<\/PostgresPassword>/g' \
+              /config/config.xml
+          echo "Secret substitution completed!"
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+        - name: SONARR_1080_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-api-keys
+              key: sonarr-1080-api-key
+        - name: SONARR_4K_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-api-keys
+              key: sonarr-4k-api-key
         volumeMounts:
         - name: config
           mountPath: /config

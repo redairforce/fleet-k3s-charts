@@ -1,78 +1,139 @@
-# qbittorrent/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
+  name: qbittorrent
+  namespace: {{ .Values.namespace }}
   labels:
     app: qbittorrent
-    release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: qbittorrent
-      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: qbittorrent
-        release: {{ .Release.Name }}
-        {{- range $key, $value := .Values.labels }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+      annotations:
+        diun.enable: "true"
+        autoheal: "true"
     spec:
-      containers:
-        - name: qbittorrent
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh", "-c", "/usr/bin/qbittorrent-nox --webui-port=8081 --profile=/config | tee -a /config/qBittorrent/logs/qbittorrent.log"]
-          env:
-            - name: PUID
-              value: {{ .Values.env.PUID | quote }}
-            - name: PGID
-              value: {{ .Values.env.PGID | quote }}
-            - name: TZ
-              value: {{ .Values.env.TZ }}
-            - name: WEBUI_PORT
-              value: {{ .Values.env.WEBUI_PORT | quote }}
-          ports:
-            - containerPort: {{ .Values.env.WEBUI_PORT }}
-              protocol: TCP
-          volumeMounts:
-            - name: config
-              mountPath: {{ .Values.volumes.config.mountPath }}
-              subPath: {{ .Values.volumes.config.subPath }}
-            - name: downloads
-              mountPath: {{ .Values.volumes.downloads.mountPath }}
-          {{- if .Values.healthcheck.enabled }}
-          livenessProbe:
-            {{- toYaml .Values.healthcheck.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.healthcheck.readinessProbe | nindent 12 }}
-          {{- end }}
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-            requests:
-              cpu: "200m"
-              memory: "256Mi"
-      volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: {{ .Values.volumes.config.pvcName }}
-        - name: downloads
-          persistentVolumeClaim:
-            claimName: {{ .Values.volumes.downloads.pvcName }}
-      {{- if .Values.nodeSelector }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml .Values.nodeSelector | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.tolerations }}
+      securityContext:
+        {{- if not .Values.rootMode }}
+        runAsUser: 1000
+        runAsGroup: 1000
+        {{- end }}
+        fsGroup: 1000
+      initContainers:
+      {{- if .Values.vuetorrent.enabled }}
+      - name: init-config
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          TARGET_FILE="/config/qBittorrent/qBittorrent.conf"
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "Copying initial qBittorrent.conf..."
+            mkdir -p /config/qBittorrent
+            cp /tmp/qbittorrent-secret/qBittorrent.conf "$TARGET_FILE"
+            echo "Config copied."
+          else
+            echo "Config already exists."
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .Values.volumes.config.subPath }}
+        - name: qbittorrent-secret
+          mountPath: /tmp/qbittorrent-secret
+      {{- end }}
+      containers:
+      - name: qbittorrent
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+          name: webui
+        - containerPort: 6881
+          name: torrent-tcp
+        - containerPort: 6881
+          name: torrent-udp
+          protocol: UDP
+        env:
+        - name: PUID
+          value: "{{ ternary "0" .Values.env.puid .Values.rootMode }}"
+        - name: PGID
+          value: "{{ ternary "0" .Values.env.pgid .Values.rootMode }}"
+        - name: TZ
+          value: "{{ .Values.env.tz }}"
+        - name: WEBUI_PORT
+          value: "8080"
+        - name: VPN_ENABLED
+          value: "yes"
+        - name: VPN_TYPE
+          value: "wireguard"
+        - name: STRICT_PORT_FORWARD
+          value: "yes"
+        - name: ENABLE_PRIVOXY
+          value: "no"
+        - name: LAN_NETWORK
+          value: "{{ .Values.env.lanNetwork }}"
+        - name: NAME_SERVERS
+          value: "{{ .Values.env.nameServers }}"
+        - name: VPN_INPUT_PORTS
+          value: "6881"
+        - name: VPN_OUTPUT_PORTS
+          value: ""
+        {{- if .Values.vuetorrent.enabled }}
+        - name: DOCKER_MODS
+          value: "{{ .Values.vuetorrent.mod }}"
+        {{- end }}
+        {{- range .Values.extraEnv }}
+        - {{ toYaml . | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          subPath: {{ .Values.volumes.config.subPath }}
+        - name: downloads
+          mountPath: /downloads
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: {{ .Values.healthcheck.startPeriod }}
+          periodSeconds: {{ .Values.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.healthcheck.timeout }}
+          failureThreshold: {{ .Values.healthcheck.retries }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.config.pvcName }}
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.downloads.pvcName }}
+      {{- if .Values.vuetorrent.enabled }}
+      - name: qbittorrent-secret
+        secret:
+          secretName: qbittorrent-secret
+      {{- end }}
+      restartPolicy: Always
       tolerations:
-        {{- toYaml .Values.tolerations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.affinity }}
-      affinity:
-        {{- toYaml .Values.affinity | nindent 8 }}
-      {{- end }}
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"

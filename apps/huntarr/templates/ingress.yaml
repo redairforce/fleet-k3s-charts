@@ -3,6 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "huntarr.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "huntarr.labels" . | nindent 4 }}
   annotations:
@@ -13,10 +14,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - {{ .Values.huntarr.hostname }}
+        - huntarr.{{ .Values.global.domain }}
       secretName: huntarr-tls
   rules:
-    - host: {{ .Values.huntarr.hostname }}
+    - host: huntarr.{{ .Values.global.domain }}
       http:
         paths:
           - path: /

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tautulli-pvc
+  namespace: {{ .Values.tautulli.namespace }}
+  labels:
+    app: tautulli
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.tautulli.pvc.size }}
+  storageClassName: {{ .Values.tautulli.pvc.storageClassName }}

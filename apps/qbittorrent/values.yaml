@@ -1,1 +1,61 @@
-hostname: "qbittorrent.williamchambless.com"
+replicaCount: 1
+namespace: "downloader"
+
+image:
+  repository: "linuxserver/qbittorrent"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+env:
+  puid: "1000"
+  pgid: "1000"
+  tz: "America/Chicago"
+  lanNetwork: "192.168.1.0/24"
+  nameServers: "1.1.1.1,1.0.0.1"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+volumes:
+  config:
+    pvcName: qbittorrent-config-pvc
+    subPath: qbittorrent
+  downloads:
+    pvcName: downloader-downloads-pvc
+
+healthcheck:
+  startPeriod: 30
+  interval: 30
+  timeout: 5
+  retries: 3
+
+resources:
+  limits:
+    memory: "4Gi"
+    cpu: "4000m"
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+
+
+# Node selector for dedicated download node
+nodeSelector:
+  kubernetes.io/hostname: node01
+
+hostname: "qbittorrent.CHANGE_ME_DOMAIN"
+
+# Add extraEnv for custom environment variables (copied from gabe565 chart approach)
+extraEnv: []
+  # Example for VueTorrent mod:
+  # - name: DOCKER_MODS
+  #   value: "ghcr.io/gabe565/linuxserver-mod-vuetorrent:latest"
+
+vuetorrent:
+  enabled: true
+  mod: "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest"  # Official VueTorrent LSIO mod
+
+# Enable root mode to allow Docker mods (required for LSIO images)
+rootMode: true  # Set to true for mods; false for non-root (more secure, but no mods)
+
+# Secret references

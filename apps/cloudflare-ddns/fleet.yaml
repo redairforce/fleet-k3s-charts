@@ -1,0 +1,8 @@
+name: cloudflare-ddns
+namespace: kube-system
+helm:
+  valuesFiles:
+    - values.yaml
+    - fleet-values.yaml
+targets:
+  - cluster: local

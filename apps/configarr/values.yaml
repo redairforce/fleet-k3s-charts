@@ -14,7 +14,7 @@ apps:
   sonarr:
     sonarr-1080:
       baseUrl: http://sonarr-1080.arr.svc.cluster.local:8989
-      apiKey: "3a6d23001ef34fb9b9f93dffd35b133a"
+      apiKey: "SONARR_1080_API_KEY_PLACEHOLDER"
       deleteOldCustomFormats: true
       replaceExistingCustomFormats: true
 
@@ -37,7 +37,7 @@ apps:
               score: -1000
     sonarr-4k:
       baseUrl: http://sonarr-4k.arr.svc.cluster.local:8989
-      apiKey: "4b7e34002fg45gc0c0g04eggf46c244b"
+      apiKey: "SONARR_4K_API_KEY_PLACEHOLDER"
       deleteOldCustomFormats: true
       replaceExistingCustomFormats: true
 
@@ -71,7 +71,7 @@ apps:
             - 9b27ab6498ec0f31a3353992e19434ca # DV (WEBDL) without HDR10 fallback (lowered)
           assign_scores_to:
             - name: WEB-2160p
-              score: 1000
+              score: -1000
         - trash_ids:
             - 27954b0a80aab882522a88a4d9eae1cd # DV SDR (penalized)
           assign_scores_to:
@@ -115,7 +115,7 @@ apps:
   radarr:
     radarr-1080:
       baseUrl: http://radarr-1080.arr.svc.cluster.local:7878
-      apiKey: "2f5c12001df24fa8a8f82cfece24a22a"
+      apiKey: "RADARR_1080_API_KEY_PLACEHOLDER"
       deleteOldCustomFormats: true
       replaceExistingCustomFormats: true
 
@@ -139,7 +139,7 @@ apps:
               score: -1000
     radarr-4k:
       baseUrl: http://radarr-4k.arr.svc.cluster.local:7878
-      apiKey: "2f5c12001df24fa8a8f82cfece24a22b"
+      apiKey: "RADARR_4K_API_KEY_PLACEHOLDER"
       deleteOldCustomFormats: true
       replaceExistingCustomFormats: true
 
@@ -178,7 +178,7 @@ apps:
             - 923b6abef9b17f937fab56cfcf89e1f1 # DV (WEBDL) without HDR10 fallback (lowered)
           assign_scores_to:
             - name: Remux + WEB 2160p
-              score: 1000
+              score: -1000
         - trash_ids:
             - a3e19f8f627608af0211acd02bf89735 # DV SDR (penalized)
           assign_scores_to:
@@ -219,3 +219,5 @@ apps:
           assign_scores_to:
             - name: Remux + WEB 2160p
               score: 100
+
+# Secret references

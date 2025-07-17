@@ -1,0 +1,22 @@
+{{- define "cleanuparr.configPvc" -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-nvme
+{{- end }}
+---
+{{- include "cleanuparr.configPvc" (dict
+  "pvcName" .Values.volumes.config.pvcName
+  "namespace" .Values.namespace
+  "appName" "cleanuparr"
+)}}

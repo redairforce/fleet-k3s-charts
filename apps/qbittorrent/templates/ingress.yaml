@@ -1,18 +1,28 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "qbittorrent.fullname" . }}
+  name: qbittorrent
+  namespace: {{ .Values.namespace }}
   labels:
-    {{- include "qbittorrent.labels" . | nindent 4 }}
+    app: qbittorrent
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - qbittorrent.{{ .Values.global.domain }}
+      secretName: qbittorrent-tls
   rules:
-    - host: qbittorrent.local  # Update this with your app name
+    - host: qbittorrent.{{ .Values.global.domain }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ include "qbittorrent.fullname" . }}
+                name: qbittorrent
                 port:
-                  number: {{ .Values.service.port }}
+                  number: 8080

@@ -1,4 +1,4 @@
-hostname: "lidarr.williamchambless.com"
+hostname: "lidarr.CHANGE_ME_DOMAIN"
 namespace: "arr"
 replicaCount: 1
 
@@ -21,7 +21,7 @@ config:
         <SslPort>9896</SslPort>
         <EnableSsl>False</EnableSsl>
         <LaunchBrowser>True</LaunchBrowser>
-        <ApiKey>3g6d23002eg35gb9b9g93dfgdf35b33e</ApiKey>
+        <ApiKey>LIDARR_API_KEY_PLACEHOLDER</ApiKey>
         <AuthenticationMethod>None</AuthenticationMethod>
         <AuthenticationRequired>Enabled</AuthenticationRequired>
         <Branch>master</Branch>
@@ -32,7 +32,7 @@ config:
         <InstanceName>Lidarr</InstanceName>
         <UpdateMechanism>Docker</UpdateMechanism>
         <PostgresUser>arruser</PostgresUser>
-        <PostgresPassword>XKUS1t1YsTGI1J</PostgresPassword>
+        <PostgresPassword>POSTGRES_PASSWORD_PLACEHOLDER</PostgresPassword>
         <PostgresPort>5432</PostgresPort>
         <PostgresHost>postgresql.arr.svc.cluster.local</PostgresHost>
         <PostgresMainDb>lidarr_main</PostgresMainDb>
@@ -65,3 +65,5 @@ resources:
   requests:
     memory: "256Mi"
     cpu: "250m"
+
+# Secret references
