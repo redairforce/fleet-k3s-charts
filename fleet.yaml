@@ -1,0 +1,37 @@
+namespace: arr
+helm:
+  values:
+    global:
+      domain: "williamchambless.com"
+targetCustomizations:
+- name: cloudflare-ddns
+  helm:
+    values:
+      global:
+        domain: "williamchambless.com"
+  clusterSelector: {}
+  namespace: kube-system
+- name: gluetun-daemon
+  clusterSelector: {}
+  namespace: vpn
+- name: qbittorrent
+  clusterSelector: {}
+  namespace: downloader
+- name: sabnzbd
+  clusterSelector: {}
+  namespace: downloader
+- name: channels
+  clusterSelector: {}
+  namespace: web
+- name: organizr
+  clusterSelector: {}
+  namespace: web
+- name: openvscode-server
+  clusterSelector: {}
+  namespace: web
+- name: tautulli
+  clusterSelector: {}
+  namespace: web
+- name: tdarr
+  clusterSelector: {}
+  namespace: tdarr
