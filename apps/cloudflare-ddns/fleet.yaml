@@ -5,4 +5,7 @@ helm:
     - values.yaml
     - fleet-values.yaml
 targets:
-  - cluster: local
+  - name: local
+    clusterSelector:
+      matchLabels:
+        name: local
