@@ -1,8 +1,0 @@
-name: APP
-namespace: default  # Adjust as needed
-helm:
-  valuesFiles:
-    - values.yaml
-    - fleet-values.yaml  # Override with deployment-specific values
-targets:
-  - cluster: local  # Your k3s cluster name in Rancher
