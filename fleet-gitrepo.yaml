@@ -1,0 +1,14 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: fleet-k3s-charts
+  namespace: fleet-local
+spec:
+  repo: https://github.com/redairforce/fleet-k3s-charts.git
+  branch: main
+  clientSecretName: auth-4w7pr
+  targets:
+    - name: local
+      clusterSelector:
+        matchLabels:
+          name: local
