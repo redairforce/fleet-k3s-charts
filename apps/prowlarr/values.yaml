@@ -1,6 +1,12 @@
 hostname: "prowlarr.CHANGE_ME_DOMAIN"
+
+global:
+  domain: "williamchambless.com"
+
 replicaCount: 1
+
 namespace: "arr"
+
 
 image:
   repository: "lscr.io/linuxserver/prowlarr"

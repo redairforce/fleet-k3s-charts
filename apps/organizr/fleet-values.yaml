@@ -1,9 +1,0 @@
-# Fleet values override file for Organizr
-# This file can be used to override default values for Fleet deployment
-
-global:
-  domain: "williamchambless.com"
-
-service:
-  main:
-    type: ClusterIP

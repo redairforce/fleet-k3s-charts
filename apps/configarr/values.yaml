@@ -1,8 +1,14 @@
 schedule: "0 * * * *"
+
+global:
+  domain: "williamchambless.com"
+
 image:
   repository: ghcr.io/raydak-labs/configarr
   tag: latest
   pullPolicy: IfNotPresent
+  pullSecret: ""
+
 namespace: arr
 
 appDataPVC: configarr-pvc

@@ -1,5 +1,11 @@
 replicaCount: 1
+
+global:
+  domain: "williamchambless.com"
+
 namespace: web
+
+
 
 image:
   repository: lscr.io/linuxserver/openvscode-server

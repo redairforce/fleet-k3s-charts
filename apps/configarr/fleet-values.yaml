@@ -1,8 +1,0 @@
-# Fleet values override file for Configarr
-# This file can be used to override default values for Fleet deployment
-
-global:
-  domain: "williamchambless.com"
-
-image:
-  pullSecret: ""

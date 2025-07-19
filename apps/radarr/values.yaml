@@ -1,6 +1,15 @@
 radarr-1080:
+
+global:
+  domain: "williamchambless.com"
   hostname: "radarr-1080.CHANGE_ME_DOMAIN"
+
+global:
+  domain: "williamchambless.com"
   replicaCount: 1
+
+global:
+  domain: "williamchambless.com"
   namespace: "arr"
   
   config:

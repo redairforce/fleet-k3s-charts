@@ -1,6 +1,15 @@
 readarrAudio:
+
+global:
+  domain: "williamchambless.com"
   hostname: "readarr-audio.CHANGE_ME_DOMAIN"
+
+global:
+  domain: "williamchambless.com"
   image:
+
+global:
+  domain: "williamchambless.com"
     repository: lscr.io/linuxserver/readarr
     tag: 0.4.18-develop
     pullPolicy: IfNotPresent

@@ -1,6 +1,15 @@
 hostname: "lidarr.CHANGE_ME_DOMAIN"
+
+global:
+  domain: "williamchambless.com"
 namespace: "arr"
+
+global:
+  domain: "williamchambless.com"
 replicaCount: 1
+
+global:
+  domain: "williamchambless.com"
 
 image:
   repository: lscr.io/linuxserver/lidarr

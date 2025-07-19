@@ -1,5 +1,11 @@
 replicaCount: 1
+
+global:
+  domain: "williamchambless.com"
+
 namespace: "downloader"
+
+
 
 image:
   repository: "linuxserver/qbittorrent"

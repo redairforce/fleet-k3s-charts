@@ -1,8 +1,0 @@
-# Fleet values override file
-# This file can be used to override default values for Fleet deployment
-
-global:
-  domain: "williamchambless.com"
-
-bazarr-1080:
-  namespace: "arr"

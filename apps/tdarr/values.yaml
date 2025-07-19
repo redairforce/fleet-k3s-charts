@@ -1,6 +1,12 @@
 replicaCount: 1
+
+global:
+  domain: "williamchambless.com"
+
 namespace: tdarr
+
 hostname: tdarr.CHANGE_ME_DOMAIN
+
 
 image:
   repository: docker.io/haveagitgat/tdarr

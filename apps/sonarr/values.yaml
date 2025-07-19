@@ -1,6 +1,12 @@
 sonarr-1080:
+
+global:
+  domain: "williamchambless.com"
+
   hostname: "sonarr-1080.CHANGE_ME_DOMAIN"
+
   replicaCount: 1
+
   namespace: "arr"
 
   config:

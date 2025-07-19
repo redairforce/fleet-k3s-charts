@@ -2,6 +2,9 @@ hostname: "cleanuparr.CHANGE_ME_DOMAIN"
 replicaCount: 1
 namespace: "arr"
 
+global:
+  domain: "williamchambless.com"
+
 image:
   repository: "ghcr.io/cleanuparr/cleanuparr"
   tag: "latest"

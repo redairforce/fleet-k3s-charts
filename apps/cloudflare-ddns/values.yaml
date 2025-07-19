@@ -1,5 +1,8 @@
 replicaCount: 1
 
+global:
+  domain: "williamchambless.com"
+
 image:
   repository: oznu/cloudflare-ddns
   tag: latest
@@ -10,7 +13,7 @@ cloudflare:
   apiToken: ""  # base64-encoded automatically by Helm if secret is created
 
   # Required fields:
-  zone: "CHANGE_ME_DOMAIN"
+  zone: "williamchambless.com"
   subdomain: home
   proxied: true
 

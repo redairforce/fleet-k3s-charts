@@ -1,3 +1,6 @@
+global:
+  domain: "williamchambless.com"
+
 tautulli:
   namespace: web
   replicaCount: 1

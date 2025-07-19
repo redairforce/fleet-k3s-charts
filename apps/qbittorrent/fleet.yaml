@@ -1,4 +1,3 @@
 helm:
   valuesFiles:
     - values.yaml
-    - fleet-values.yaml
