@@ -1,1 +1,1 @@
-defaultNamespace: arr
+# Removed global defaultNamespace - each app manages its own namespace via values.yaml
