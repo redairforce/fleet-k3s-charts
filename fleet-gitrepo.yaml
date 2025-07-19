@@ -6,7 +6,7 @@ metadata:
 spec:
   repo: https://github.com/redairforce/fleet-k3s-charts.git
   branch: main
-  clientSecretName: auth-4w7pr
+  clientSecretName: auth-bpmxd
   paths:
     - apps
   targets:
