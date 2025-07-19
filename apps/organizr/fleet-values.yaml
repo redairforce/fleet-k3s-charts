@@ -3,3 +3,7 @@
 
 global:
   domain: "williamchambless.com"
+
+service:
+  main:
+    type: ClusterIP

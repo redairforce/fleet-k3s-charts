@@ -3,3 +3,6 @@
 
 global:
   domain: "williamchambless.com"
+
+sonarr-1080:
+  namespace: "arr"

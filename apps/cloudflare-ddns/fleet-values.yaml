@@ -4,6 +4,9 @@
 global:
   domain: "williamchambless.com"
 
+image:
+  repository: oznu/cloudflare-ddns
+
 cloudflare:
   zone: "williamchambless.com"
   subdomain: home

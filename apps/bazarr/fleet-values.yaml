@@ -4,9 +4,5 @@
 global:
   domain: "williamchambless.com"
 
-# You can also override other values here as needed
-# For example:
-# bazarr-1080:
-#   resources:
-#     limits:
-#       memory: "1Gi"
+bazarr-1080:
+  namespace: "arr"

@@ -3,3 +3,6 @@
 
 global:
   domain: "williamchambless.com"
+
+tautulli:
+  namespace: "arr"
