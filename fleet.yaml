@@ -1,5 +1,1 @@
 defaultNamespace: arr
-helm:
-  values:
-    global:
-      domain: "williamchambless.com"
